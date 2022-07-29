@@ -9,7 +9,7 @@ norm_abstract(abstract, first_author_last_name)
 \arguments{
 \item{abstract}{A character vector (e.g., a column in a data frame)}
 
-\item{first_author_last_name}{A character vector containing last name of first author, or \code{FALSE}.
+\item{first_author_last_name}{A character vector containing last name of first author, or \code{FALSE}. By default, I suggest supplying \code{first_author_last_name}.
 
 If not \code{FALSE}, index of \code{abstract} and \code{first_author_last_name} must be the same for the same bibliographic record. This should not be an issue if analyzing based on a data frame.
 
@@ -29,12 +29,12 @@ For abstract, we do the following string normalization.
 }
 }
 \examples{
-b_example <- read.csv(file = "data/b_example_abstract.csv")
+data(bib_example_small)
 
-b_example$first_author_last_name <- sapply(stringr::str_split(b_example$author, ",",  n = 2), `[`, 1)
+bib_example_small$first_author_last_name <- sapply(stringr::str_split(bib_example_small$author, ",",  n = 2), `[`, 1)
 
 
-b_example$abstract_norm <- norm_abstract(b_example$abstract, b_example$first_author_last_name)
+bib_example_small$abstract_norm <- norm_abstract(bib_example_small$abstract, bib_example_small$first_author_last_name)
 # or
-b_example$abstract_norm <- norm_abstract(b_example$abstract, FALSE)
+bib_example_small$abstract_norm <- norm_abstract(bib_example_small$abstract, FALSE)
 }

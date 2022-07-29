@@ -6,7 +6,7 @@
 #' - remove whitespace from start and end of string; also reduce repeated whitespace inside the string.
 #'
 #' @param abstract A character vector (e.g., a column in a data frame)
-#' @param first_author_last_name A character vector containing last name of first author, or `FALSE`.
+#' @param first_author_last_name A character vector containing last name of first author, or `FALSE`. By default, I suggest supplying `first_author_last_name`.
 #'
 #' If not `FALSE`, index of `abstract` and `first_author_last_name` must be the same for the same bibliographic record. This should not be an issue if analyzing based on a data frame.
 #'

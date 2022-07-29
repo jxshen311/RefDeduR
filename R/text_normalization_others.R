@@ -24,7 +24,7 @@ norm_title <- function(title){
 
   title_norm <- tolower(title_norm)
 
-  title_norm <- removePunctuation(title_norm)
+  title_norm <- tm::removePunctuation(title_norm)
   title_norm <- gsub(" ", "", title_norm)
 
   return(title_norm)

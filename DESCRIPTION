@@ -23,3 +23,6 @@ Imports:
     tibble,
     tidyr,
     tm
+Depends: 
+    R (>= 2.10)
+LazyData: true
