@@ -1,10 +1,20 @@
-# deduplicate based on doi ----
-# only deduplicate on the subset with DOI
-dedu_exact_match <- function(
+#' Find duplicates by exact match
+#'
+#' @param df A data frame with bibliographic information that has gone through text normalization. `df` must have at least the following 6 columns `c("author", "title", "journal", "abstract", "year", "doi")`.
+#' @param match_by
+#' @param double_check
+#' @param check_by
+#'
+#' @return
+#' @export
+#'
+#' @examples
+dup_find_exact <- function(
     df,
-    based_on = c("doi_norm", "title", "title_norm"),
-    manual_check = TRUE
-    ){
+    match_by, # c("doi_norm", "title", "title_norm")
+    double_check = FALSE,
+    check_by = "first_author_last_name_norm"
+){
   # 0. check df ----
   if(missing(df)){
     stop("'Data frame' is missing: Please provide a data frame")
@@ -18,89 +28,60 @@ dedu_exact_match <- function(
          c("author", "title", "journal", "abstract", "year", "doi")')
   }
 
-
-
-  # 1. based_on includes doi_norm ----
-  if("doi_norm" %in% based_on){
-    # check necessary information
-    if(!("doi_norm" %in% colnames(df))){
-      stop('Column "doi_norm" is missing')
-    }
-
-    # subset df according to the existence of doi
-    df_doi_no <- df[is.na(df$doi_norm), ]
-    df_doi_yes <- df[!is.na(df$doi_norm), ]
-
-    # order (so that the most recent version will be kept) and remove duplicates
-    df_doi_yes <- df_doi_yes[with(df_doi_yes, order(doi_norm, -year)), ]
-    df_doi_yes_uni <- df_doi_yes[!duplicated(df_doi_yes$doi_norm), ]
-
-    # combine with records without doi
-    df <- rbind(df_doi_yes_uni, df_doi_no)
+  # 1. check the existence of match_by column ----
+  if(!(match_by %in% colnames(df))){
+    stop('Column to match_by is missing.')
   }
 
+  # 2. subset df according to the existence ----
+  df_no <- df[is.na(df[[match_by]]), ]
+  df_yes <- df[!is.na(df[[match_by]]), ]
 
+  # 3. order so that the most recent version will be kept ----
+  df_yes <- df_yes[order(-df_yes[ ,which(colnames(df_yes)=="year")]), ]
 
-  # 2. based_on includes title ----
-  if("title" %in% based_on){
-    # subset df according to the existence (normally all records have title)
-    df_ti_no <- df[is.na(df$title), ]
-    df_ti_yes <- df[!is.na(df$title), ]
+  # reset row names
+  row.names(df_no) <- NULL
+  row.names(df_yes) <- NULL
 
-    # order (so that the most recent version will be kept) and remove duplicates
-    df_ti_yes <- df_ti_yes[with(df_ti_yes, order(title, -year)), ]
-    df_ti_yes_uni <- df_ti_yes[!duplicated(df_ti_yes$title), ]
+  # 4. create helper column: match ----
+  df_yes$match <- as.numeric(factor(df_yes[[match_by]], ))
 
-    # combine with records without title
-    df <- rbind(df_ti_yes_uni, df_ti_no)
-  }
+  df_no <- tibble::rownames_to_column(df_no, var = "match")
+  df_no <- df_no %>% relocate(match, .after = last_col())
+  df_no$match <- as.numeric(df_no$match)
+  df_no$match = df_no$match + max(df_yes$match)
 
+  # 5. combine df_yes and df_no ----
+  df <- rbind(df_yes, df_no)
 
+  # 6. double_check ----
+  if(!double_check){
+    return(df)
+  } else if (double_check){
+    # check the existence of column
+    if(!(check_by %in% colnames(df))){
+      stop('Column to check against is missing.
+      Default to "first_author_last_name_norm"')}
 
-  # 3. based_on includes title_norm ----
-  if("title_norm" %in% based_on){
-    # check necessary information
-    if(!("title_norm" %in% colnames(df))){
-      stop('Column "title_norm" is missing')
-    }
-
-    # subset df according to the existence (normally all records have title)
-    df_tinorm_no <- df[is.na(df$title_norm), ]
-    df_tinorm_yes <- df[!is.na(df$title_norm), ]
-
-
-    # order so that the most recent version will be kept
-    b2 <- b2[with(b2, order(-year)), ]
-
-    b2$match <- as.numeric(factor(b2$title_norm, ))
-
-    # 1. If title_norm and first_author_last_name_norm are both the same, remove duplicates without review ----
-    # 2. When title_norm is the same but first_author_last_name_norm is different, output the dataframe for manual review ----
-    b2_manual_check <- b2 %>%
-      group_by(title_norm) %>%
-      filter(dplyr::n_distinct(first_author_last_name_norm) >= 2)
+    # double check criteria
+    # 1. If title_norm and first_author_last_name_norm are both the same, remove duplicates without review
+    # 2. When title_norm is the same but first_author_last_name_norm is different, output the dataframe for manual review
+    df_manual_check <- df %>%
+      group_by(match) %>%
+      filter(length(unique(.data[[check_by]])) >= 2)
 
     # either review in dataframe format (preview in R or write.xlsx()) or call revtools shiny app
     # call revtools shiny app
-    # screen_duplicates(b2_manual_check)
+    # screen_duplicates(df_manual_check)
 
     # we can use the override_duplicates() function in synthesisr to manually mark records as unique
     # new_match_vector <- synthesisr::override_duplicates(match number vector, the match number to override)
     # test$match_new <- synthesisr::override_duplicates(test$match, 3825)
-
-
-
-    # remove duplicates
-    b3 <- b2[!duplicated(b2$match), ]
-    # or
-    # b3 <- synthesisr::extract_unique_references(b2, b2$match) # this does remove the second row hit
-
-    # remove helper columns
-    b3 <- select(b3, -match)
-
-
-
-
+    return(list(df, df_manual_check))
   }
-
 }
+
+
+
+
