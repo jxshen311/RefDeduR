@@ -1,8 +1,8 @@
 ---
-title: "RefDeduR"
+title: "RefDeduR: a text-normalization and decision-tree aided R package enabling accurate and high-throughput reference deduplication for large datasets"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{RefDeduR}
+  %\VignetteIndexEntry{RefDeduR: a text-normalization and decision-tree aided R package enabling accurate and high-throughput reference deduplication for large datasets}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,3 +17,20 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(RefDeduR)
 ```
+
+## Introduction
+
+## Pre-process
+
+## Read bibliographic files into a data frame
+We use function `revtools::read_bibliography()` to read bibTex file into a data frame. 
+
+- I recommend using bibTex files here. According to past experience, reading .ris file seems to have formatting errors. 
+- Alternative function: `synthesisr::read_refs()`
+
+```{r}
+b <- read_bibliography("develop/dataset_id_trans_unaccented.bib") # 6384
+```
+
+## Text cleaning and normalization
+
