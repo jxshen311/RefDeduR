@@ -2,7 +2,7 @@
 #'
 #' For abstract, we do the following string normalization.
 #' - Remove tailing information such as ". (C) 1998 International Astronautical Federation Published by Elsevier Science Ltd. All rights reserved." and "(C) 2000 Elsevier Science B.V. All rights reserved." according to 6 patterns observed empirically, to reduce the effect of the information.
-#' - convert letters to lowercase\
+#' - convert letters to lowercase
 #' - remove whitespace from start and end of string; also reduce repeated whitespace inside the string.
 #'
 #' @param abstract A character vector (e.g., a column in a data frame)

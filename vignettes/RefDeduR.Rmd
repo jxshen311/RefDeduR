@@ -20,17 +20,64 @@ library(RefDeduR)
 
 ## Introduction
 
+## Example dataset
+
+We use an example dataset to demonstrate the recommended pipeline of RefDeduR. The dataset contains all bibliographic records (n = 6384) retrieved in a systematic review on indoor surface microbiome studies. The systematic search was conducted on 2022-01-10 through 3 platforms (i.e., PubMed, Web of Science, and Scopus).
+
+#//TODO: add info (1. preprocessing; 2. `bib_example_complete`)
+
 ## Pre-process
 
 ## Read bibliographic files into a data frame
-We use function `revtools::read_bibliography()` to read bibTex file into a data frame. 
 
-- I recommend using bibTex files here. According to past experience, reading .ris file seems to have formatting errors. 
-- Alternative function: `synthesisr::read_refs()`
+We use function `revtools::read_bibliography()` to read bibTex file into a data frame.
+
+-   I recommend using bibTex files here. According to past experience, reading .ris file seems to have formatting errors.
+-   Alternative function: `synthesisr::read_refs()`
 
 ```{r}
-b <- read_bibliography("develop/dataset_id_trans_unaccented.bib") # 6384
+# Output the path to the example dataset
+path_to_bibfile <- system.file("extdata", "dataset_trans_unaccented.bib", package = "RefDeduR")
+
+# Print the path to confirm
+print(path_to_bibfile)
+
+# Read bibTex file into a data frame
+b <- read_bibliography(path_to_bibfile) # 6384 rows
+
+# We can check the number of missing values in each column
+# Pay attention to `title` column as we expect all records to have titles.
+# If your dataset has only a few NAs in title, maybe it is worth resolving the missing values manually. If your dataset has a substantial number of NAs in title (according to our experience, this is extremely rare), consider sub-setting the dataset and deduplicating separately.
+colSums(is.na(b))
 ```
 
 ## Text cleaning and normalization
 
+Before deduplication, we first apply multiple fine text cleaning and normalization to the dataset. A finer text normalization increases the chance of successful deduplication at the exact match step, where both accuracy and confidence are assured.
+
+This step includes not only standard text normalization such as converting letters to lowercase, but also tailored operations in response to patterns we observed, such as removing trademark "(TM)" in `title`, removing English stop words in `journal`, and removing publisher/citation information in `abstract`. Additionally, we extract helper columns which we will use downstream. See details in each `norm_` and `extract_` functions' documentation pages.
+
+```{r}
+b <- norm_df(b)
+# This function `norm_df` wraps all (1) text normalization and (2) helper field extraction that are needed.
+# By default, expect the function to add 8 more columns compared with the original data frame.
+# Alternatively, if you want to customize the normalization operations, refer to its sub-functions by `?norm_df` or hack the source code.
+```
+
+## Deduplicate by exact match
+
+We suggest first deduplicating by exact match based on 1) "doi_norm", 2) "title", and 3) "title_norm" in order. DOI is decisive (i.e., unique to a publication). Title is also highly selective.
+
+Note that here we assume different research papers wouldn't have 100% identical titles before text normalization. This assumption should hold in most normal cases as indicated previously [(1)](https://cran.r-project.org/web/packages/synthesisr/vignettes/synthesisr_vignette.html) [(2)](https://www.researchgate.net/post/Is-it-possible-to-publish-an-article-with-nearly-similar-title-of-a-previously-published-one).
+
+The assumption may not apply to special publication types in studies that heavily focus on clinical therapies. For example, we observed that identical titles present in the deduplicated dataset in [this paper](https://systematicreviewsjournal.biomedcentral.com/articles/10.1186/s13643-021-01583-y#Sec2).
+
+```{r}
+df_new <- dedu_exact(df, match_by = c("doi_norm", "title", "title_norm"))
+
+
+
+# not included in the standard pipeline but you can try exact match against "abstract_norm"
+
+
+```
