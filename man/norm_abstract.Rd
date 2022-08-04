@@ -24,7 +24,7 @@ Normalized character vector
 For abstract, we do the following string normalization.
 \itemize{
 \item Remove tailing information such as ". (C) 1998 International Astronautical Federation Published by Elsevier Science Ltd. All rights reserved." and "(C) 2000 Elsevier Science B.V. All rights reserved." according to 6 patterns observed empirically, to reduce the effect of the information.
-\item convert letters to lowercase\
+\item convert letters to lowercase
 \item remove whitespace from start and end of string; also reduce repeated whitespace inside the string.
 }
 }

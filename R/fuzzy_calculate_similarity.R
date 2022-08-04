@@ -1,11 +1,22 @@
 # assume all records have title
 # result: calculate similarity - alphabetic order: 46.962 sec elapsed
 # calculate similarity based on Levenshtein edit distance for columns `"title_norm"`, `"author_norm"`, `"abstract_norm"`, and `"first_author_last_name_norm"` between adjacent rows.
+
+#' Title
+#'
+#' @param df
+#' @param order_by
+#'
+#' @return
+#' @export
+#'
+#' @examples
 simi_order_df <- function(
     df,
-    order_by = "title_norm",
+    order_by = "title_norm"
 
-){# check df ----
+){
+  # check df ----
   if(missing(df)){
     stop("'Data frame' is missing: Please provide a data frame")
   }

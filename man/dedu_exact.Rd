@@ -19,6 +19,7 @@ Deduplicated \code{df}.
 \description{
 \itemize{
 \item This automatically removes duplicates identified by exact match without manual review.
+\item The most recent version will be retained at removal.
 \item Support deduplication based on multiple columns (one at a time).
 }
 }

@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(RefDeduR)
+
+
 ```
 
 ## Introduction
@@ -43,9 +45,9 @@ path_to_bibfile <- system.file("extdata", "dataset_trans_unaccented.bib", packag
 print(path_to_bibfile)
 
 # Read bibTex file into a data frame
-b <- read_bibliography(path_to_bibfile) # 6384 rows
+b <- revtools::read_bibliography(path_to_bibfile) # 6384 rows
 
-# We can check the number of missing values in each column
+# We can check the number of missing values in each column.
 # Pay attention to `title` column as we expect all records to have titles.
 # If your dataset has only a few NAs in title, maybe it is worth resolving the missing values manually. If your dataset has a substantial number of NAs in title (according to our experience, this is extremely rare), consider sub-setting the dataset and deduplicating separately.
 colSums(is.na(b))
@@ -72,12 +74,52 @@ Note that here we assume different research papers wouldn't have 100% identical 
 
 The assumption may not apply to special publication types in studies that heavily focus on clinical therapies. For example, we observed that identical titles present in the deduplicated dataset in [this paper](https://systematicreviewsjournal.biomedcentral.com/articles/10.1186/s13643-021-01583-y#Sec2).
 
+### First, we deduplicate based on "doi_norm" and "title".
+
 ```{r}
-df_new <- dedu_exact(df, match_by = c("doi_norm", "title", "title_norm"))
-
-
-
-# not included in the standard pipeline but you can try exact match against "abstract_norm"
-
-
+# We remove the identified duplicates without manual review because this is fairly conservative.
+b1 <- dedu_exact(b, match_by = c("doi_norm", "title"))
+# The most recent version will be retained at removal.
 ```
+
+### Then, we deduplicate based on "title_norm"
+
+To make sure that we don't delete unique records, we introduce a `double_check` mechanism here and output the duplicate sets with different `check_by` (defaults to `"first_author_last_name"`) to `b1_manual_check` for manual review.
+
+Usually, the number of duplicate sets requires review is very small (e.g., in this case, only 1 set needs to be reviewed).
+
+It is worth noting that incorporating the `double_check` mechanism here is extremely conservative. If double checking is not needed, you can incorporate `"title_norm"` into `dedu_exact()`.
+
+```{r}
+c(b1, b1_manual_check) %<-% dup_find_exact(b1, match_by = "title_norm", double_check = TRUE, check_by = "first_author_last_name_norm")  # Syntax %<-% must be used in this case to have the function return 2 data frames.
+```
+
+If `b1_manual_check` is empty, nothing needs to be manually reviewed. Otherwise, you can either (1) review it in a data frame format (e.g., preview in R or `write.xlsx()`) or (2) call revtools shiny app to review.
+
+-   **Note:** It seems that `revtools::screen_duplicates()` can only display duplicate **pairs** correctly (i.e., it only displays 2 records of a duplicate set with more than 2 records). *So I recommend trying option (1) first.*
+
+-   Command to call revtools shiny app: `revtools::screen_duplicates(as.data.frame(b1_manual_check))`
+
+If the records reviewed are duplicates, we can proceed to removing duplicates. Otherwise, if you find a record unique, we can mark them by modifying their `match` number.
+
+-   Using `match == 3011` and `first_author_last_name_norm == "de Oliveira"` as an example, run `b1$match[which(b1$match == 3011 & b1$first_author_last_name_norm == "de Oliveira")] <- max(b1$match)+1`
+
+-   Alternatively, we can use function `synthesisr::override_duplicates()`: `b1$match <- synthesisr::override_duplicates(b1$match, 3011)`. Note that this only works for duplicate pairs. If the duplicate set has more than 2 records, this can only mark the final record unique.
+
+Once we finalize `match`, we can remove duplicates.
+
+```{r}
+b2 <- b1[!duplicated(b1$match), ]
+# The most recent version will be retained at removal.
+```
+
+> 🗒️ Although it is not included in this standard pipeline, you can try further performing exact match based on "abstract_norm".
+
+## Deduplicate by fuzzy match
+
+After we remove all duplicates by the high-confidence exact match, we now proceed to fuzzy match. To improve the computational efficiency, we divide this process into 2 steps: (1) order the records alphabatically according to `title_norm` and compare only between the adjacent rows; (2) perform pairwise comparisons between records within the same group partitioned by the first 2 letters of `first_author_last_name_norm`.
+
+Fuzzy match is made by calculating string similarity based on Levenshtein edit distance.
+
+
+

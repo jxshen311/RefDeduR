@@ -24,9 +24,9 @@
 #' df <- norm_df(bib_example_small)
 #'
 #' # example 1:
-#' df <- dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
+#' df_1 <- dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
 #' # Alternatively, %<-% will also work
-#' df %<-% dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
+#' df_2 %<-% dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
 #'
 #' # example 2:
 #' c(df, df_manual_check) %<-% dup_find_exact(df, match_by = "title_norm", double_check = TRUE, check_by = "first_author_last_name_norm")  # Syntax %<-% must be used in this case to have the function return 2 data frames.
@@ -119,6 +119,7 @@ dup_find_exact <- function(
 #'
 #' @description
 #' - This automatically removes duplicates identified by exact match without manual review.
+#' - The most recent version will be retained at removal.
 #' - Support deduplication based on multiple columns (one at a time).
 #'
 #' @details
