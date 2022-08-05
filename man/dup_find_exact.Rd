@@ -37,6 +37,8 @@ Within each identified duplicate set, if \code{check_by} is the same, remain as 
 }
 }
 \examples{
+library(zeallot)  # to use `\%<-\%`
+
 # load example dataset
 data(bib_example_small)
 
@@ -44,9 +46,9 @@ data(bib_example_small)
 df <- norm_df(bib_example_small)
 
 # example 1:
-df <- dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
+df_1 <- dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
 # Alternatively, \%<-\% will also work
-df \%<-\% dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
+df_2 \%<-\% dup_find_exact(df, match_by = "doi_norm", double_check = FALSE)
 
 # example 2:
 c(df, df_manual_check) \%<-\% dup_find_exact(df, match_by = "title_norm", double_check = TRUE, check_by = "first_author_last_name_norm")  # Syntax \%<-\% must be used in this case to have the function return 2 data frames.

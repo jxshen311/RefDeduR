@@ -14,6 +14,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: 
+    dplyr,
     ggplot2,
     reshape2,
     revtools,
@@ -21,11 +22,10 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    tm
-Depends: 
-    dplyr,
-    R (>= 2.10),
+    tm,
     zeallot
+Depends: 
+    R (>= 2.10)
 LazyData: true
 Suggests: 
     knitr,

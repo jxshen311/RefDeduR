@@ -17,6 +17,8 @@
 #' @export
 #'
 #' @examples
+#' library(zeallot)  # to use `%<-%`
+#'
 #' # load example dataset
 #' data(bib_example_small)
 #'

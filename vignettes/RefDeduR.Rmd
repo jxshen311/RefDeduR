@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(RefDeduR)
 
-
+library(zeallot)  # if need to use `%<-%`
 ```
 
 ## Introduction
@@ -109,8 +109,12 @@ If the records reviewed are duplicates, we can proceed to removing duplicates. O
 Once we finalize `match`, we can remove duplicates.
 
 ```{r}
+# In this example, no unique record is found in b1_manual_check.
 b2 <- b1[!duplicated(b1$match), ]
 # The most recent version will be retained at removal.
+
+# In order not to interfere downstream processes, we remove the "match" column
+b2 <- select(b2, -match)
 ```
 
 > 🗒️ Although it is not included in this standard pipeline, you can try further performing exact match based on "abstract_norm".
@@ -121,5 +125,22 @@ After we remove all duplicates by the high-confidence exact match, we now procee
 
 Fuzzy match is made by calculating string similarity based on Levenshtein edit distance.
 
+### Fuzzy 1: alphabatic order
+
+Firstly, we calculate string similarity between adjacent rows for columns `"title_norm"`, `"author_norm"`, `"abstract_norm"`, and `"first_author_last_name_norm"`.
+```{r}
+b2_simi <- simi_order_df(b2, order_by = "title_norm")
+# Computing time estimation: ~ 47 sec for this data frame (3837 rows) on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
+```
+
+Two major practical challenges of making the fuzzy-match deduplication process both accurate and high-throughput, especially for large datasets, which the number of duplicates sets requiring manual review could be unfeasibly high (e.g., ).
+1. How do we choose a sensible cutoff threshold for the similarity score? - we provide a dataset-aware method
+2. How do we accelerate the "manual review" step and reduce burden of manual screening? - decision tree
+
+## recommendation
+treat these as modules, we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
+
+with the finely tuned text cleaning and normalization, even just exact match out competes many tools
+- alphabetic order is also very fast
 
 

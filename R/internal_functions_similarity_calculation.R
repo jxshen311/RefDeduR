@@ -24,7 +24,6 @@ simi_edit <- function(a, b){
 #'
 #' @keywords internal
 #' @noRd
-#' @examples
 simi_edit_pairwise <- function(data, column_name){
   simi_matrix <- stringsimmatrix(data, method = "lv")
 
