@@ -59,7 +59,7 @@ dup_find_exact <- function(
     stop("Please quote the column name. That is, `class(match_by)` must be character.")
   }
   if(!(match_by %in% colnames(df))){
-    stop('Column to match_by is missing.')
+    stop('Column to match_by is missing in the data frame.')
   }
 
   # 2. subset df according to the existence ----

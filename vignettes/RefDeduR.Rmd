@@ -121,26 +121,47 @@ b2 <- select(b2, -match)
 
 ## Deduplicate by fuzzy match
 
-After we remove all duplicates by the high-confidence exact match, we now proceed to fuzzy match. To improve the computational efficiency, we divide this process into 2 steps: (1) order the records alphabatically according to `title_norm` and compare only between the adjacent rows; (2) perform pairwise comparisons between records within the same group partitioned by the first 2 letters of `first_author_last_name_norm`.
+After we remove all duplicates by the high-confidence exact match, we now proceed to fuzzy match. Fuzzy match is made by calculating string similarity based on Levenshtein edit distance.
 
-Fuzzy match is made by calculating string similarity based on Levenshtein edit distance.
+Two major practical challenges of making the fuzzy-match deduplication process both accurate and high-throughput are
 
-### Fuzzy 1: alphabatic order
+1.  How do we choose a sensible cutoff threshold for the similarity score?
+
+2.  How do we accelerate the "manual review" step and reduce burden of manual screening?
+
+We propose two strategies to address these challenges correspondingly.
+
+1.  We examine the similarity distribution plots and use the inflection point of the curve as the sensible cutoff threshold. This is a dataset-aware method, and it also allows fine-tuning of the cutoff threshold.
+
+2.  We introduce a decision tree that incorporates multiple fields to automate the "manual review" step. This is especially helpful for large datasets, in which case the number of duplicate sets requiring manual review could be unfeasibly high (e.g., revtools outputed \~1,400 duplicate sets for manual confirmation when treating this example dataset).
+
+To improve the computational efficiency, we divide this process into 2 steps: (1) order the records alphabetically according to `title_norm` and compare only between the adjacent rows; (2) perform pairwise comparisons between records within the same group partitioned by the first 2 letters of `first_author_last_name_norm`.
+
+### Fuzzy 1: alphabetic order
 
 Firstly, we calculate string similarity between adjacent rows for columns `"title_norm"`, `"author_norm"`, `"abstract_norm"`, and `"first_author_last_name_norm"`.
+
 ```{r}
 b2_simi <- simi_order_df(b2, order_by = "title_norm")
 # Computing time estimation: ~ 47 sec for this data frame (3837 rows) on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
 ```
 
-Two major practical challenges of making the fuzzy-match deduplication process both accurate and high-throughput, especially for large datasets, which the number of duplicates sets requiring manual review could be unfeasibly high (e.g., ).
-1. How do we choose a sensible cutoff threshold for the similarity score? - we provide a dataset-aware method
-2. How do we accelerate the "manual review" step and reduce burden of manual screening? - decision tree
+Then we plot similarity distributions of normalized title and abstract to choose cutoffs.
+
+```{r}
+# Distribution of similarity scores based on normalized title
+p_b2_ti <- plot_simi_dist(b2_simi, "title_simi")
+p_b2_ti  # show plot in the Plots tab
+
+# Distribution of similarity scores based on normalized abstract
+p_b2_ab <- plot_simi_dist(b2_simi, "abstract_simi")
+p_b2_ab  # show plot in the Plots tab
+```
+
+According to the plots, 0.7 or 0.6 seem sensible curoff thresholds. For demonstration purpose, we will use 0.7 here.
 
 ## recommendation
+
 treat these as modules, we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
 
-with the finely tuned text cleaning and normalization, even just exact match out competes many tools
-- alphabetic order is also very fast
-
-
+with the finely tuned text cleaning and normalization, even just exact match out competes many tools - alphabetic order is also very fast
