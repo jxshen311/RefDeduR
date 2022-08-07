@@ -17,3 +17,17 @@ A scatterplot of distributions of similarity scores
 \description{
 Generate similarity distribution plot
 }
+\examples{
+\dontrun{
+# `df_simi` is the data frame resulted from `simi_order_df()`
+# see the example in the `simi_order_df()` help page for how `df_simi` is generated
+
+# Distribution of similarity scores based on normalized title
+p_ti <- plot_simi_dist(df_simi, "title_simi")
+p_ti  # show p_ti in the Plots tab
+
+# Distribution of similarity scores based on normalized abstract
+p_ab <- plot_simi_dist(df_simi, "abstract_simi")
+p_ab  # show p_ab in the Plots tab
+}
+}

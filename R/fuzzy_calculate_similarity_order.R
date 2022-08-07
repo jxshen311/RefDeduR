@@ -5,7 +5,7 @@
 #' @param df A data frame with bibliographic information that has gone through text normalization. `df` must have the following columns `c("title_norm", "abstract_norm")`.
 #' @param order_by Quoted name of the column by which to order the rows. Defaults to `"title_norm"`.
 #'
-#' @return A data frame with string similarity results for `"title_norm"` and `"abstract_norm"`.
+#' @return Two data frames. (1) Ordered `df`; (2) A data frame with string similarity results for `"title_norm"` and `"abstract_norm"`. Both data frames have a matched `id` column.
 #'
 #' @details This function is based on the assumption that all records have titles.
 #'
@@ -13,6 +13,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # load example dataset
 #' data(bib_example_small)
 #'
@@ -20,9 +21,9 @@
 #' df <- norm_df(bib_example_small)
 #'
 #' # calculate similarity
-#' df_simi <- simi_order_adj(df, order_by = "title_norm")
+#' c(df, df_simi) %<-% simi_order_adj(df, order_by = "title_norm")
 #' # df_simi[1, ] stores similarity results between df[1, ] and df[2, ]
-#'
+#' }
 simi_order_adj <- function(
     df,
     order_by = "title_norm"
@@ -68,6 +69,6 @@ simi_order_adj <- function(
   df_simi <- tibble::rownames_to_column(df_simi, var = "id")
   df_simi$id <- as.integer(df_simi$id)
 
-  return(df_simi)
+  return(list(df, df_simi))
 }
 

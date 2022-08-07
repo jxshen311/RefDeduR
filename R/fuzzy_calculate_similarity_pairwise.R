@@ -1,4 +1,4 @@
-# assign "00" to where NA : "00" is used as the code. if you customize your own partitioning parameter, try to avoid this
+
 # result: calculate similarity - pairwise after partitioning: 1436.371 sec elapsed
 #' Calculate pairwise string similarity
 #'
@@ -7,14 +7,28 @@
 #' @param df A data frame with bibliographic information that has gone through text normalization. `df` must have the following columns `c("title_norm", "abstract_norm")`.
 #' @param partition_by Quoted name of the column by which to partition the rows. Defaults to `"first_two_letters_first_author_last_name"`. Can be `FALSE` if prefer not to partition, in which case all records are compared against all others.
 #'
-#' We recommend ...//////"year", construct a custom "partition" column, FALSE
-# how to treat NA, against all or only within NA group
-#' Quoted name of the column with information to double check by. Not required/ignored if `double_check == FALSE`. Defaults to `"first_author_last_name_norm"` if `double_check == TRUE`.
+#' Besides the default, `"year"` is another popular partitioning parameter. We recommend the default method if papers in your dataset are not evenly distributed across years. For instance, if most papers are recent, the dafault method will be much more efficient than `"year"`. Additionally, with the prevalence of preprints, partitioning by `"year"` becomes less accurate.
 #'
-#' @return
+#' In addition, you can also construct a custom "partition" column.
+#'
+#' @details An artificial code "00" is assigned to cells with missing values in the `partition_by` column and these rows are partitioned into one group. If you customize your own partitioning parameter, try to avoid this artificial code.
+#'
+#' Computing time estimation according to past experience: ~ 23 min for a data frame with 3837 rows on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
+#'
+#' @return Two list of data frames. (1) A list of data frames containing the partitioned `df`; (2) A list of data frames with string similarity results for `"title_norm"` and `"abstract_norm"`.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # load example dataset
+#' data(bib_example_small)
+#'
+#' # text normalization of the data frame
+#' df <- norm_df(bib_example_small)
+#'
+#' # calculate similarity
+#' c(ls_df, ls_df_simi) %<-% simi_ptn_pair(df, partition_by = "first_two_letters_first_author_last_name")
+#' }
 simi_ptn_pair <- function(
     df,
     partition_by = "first_two_letters_first_author_last_name" # "year", construct a custom "partition" column, FALSE
@@ -79,6 +93,10 @@ simi_ptn_pair <- function(
     temp_simi_ti <- simi_edit_pairwise(ls_df[[ii]]$title_norm, "title_simi")
     temp_simi_ab <- simi_edit_pairwise(ls_df[[ii]]$abstract_norm, "abstract_simi")
     ls_df_simi[[ii]] <- dplyr::full_join(temp_simi_ti, temp_simi_ab, by = c("Var1", "Var2"))
+
+    # rename "Var1", "Var2" to more self-explanatory texts (base function is faster)
+    colnames(ls_df_simi[[ii]])[colnames(ls_df_simi[[ii]]) == "Var1"] <- "id_r1"
+    colnames(ls_df_simi[[ii]])[colnames(ls_df_simi[[ii]]) == "Var2"] <- "id_r2"
   }
 
   return(list(ls_df, ls_df_simi))
