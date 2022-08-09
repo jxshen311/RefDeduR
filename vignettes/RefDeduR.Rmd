@@ -142,7 +142,7 @@ To improve the computational efficiency, we divide this process into 2 steps: (1
 Firstly, we calculate string similarity between adjacent rows for columns `"title_norm"`, `"author_norm"`, `"abstract_norm"`, and `"first_author_last_name_norm"`.
 
 ```{r}
-b2_simi <- simi_order_df(b2, order_by = "title_norm")
+c(b2, b2_simi) %<-% simi_order_adj(b2, order_by = "title_norm")
 # Computing time estimation: ~ 47 sec for this data frame (3837 rows) on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
 ```
 
@@ -159,6 +159,12 @@ p_b2_ab  # show plot in the Plots tab
 ```
 
 According to the plots, 0.7 or 0.6 seem sensible curoff thresholds. For demonstration purpose, we will use 0.7 here.
+
+```{r}
+c(b2, id_dup_pair_adj) %<-% dup_find_fuzzy_adj(b2, b2_simi, cutoff_title = 0.7, cutoff_abstract = 0.7)
+
+
+```
 
 ## recommendation
 

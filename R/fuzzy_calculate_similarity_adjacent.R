@@ -9,7 +9,7 @@
 #'
 #' @details This function is based on the assumption that all records have titles.
 #'
-#' Computing time estimation according to past experience: ~ 47 sec for a data frame with 3837 rows on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
+#' Computing time estimation according to past experience: ~ 46 seconds for a data frame with 3837 rows on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
 #' @export
 #'
 #' @examples

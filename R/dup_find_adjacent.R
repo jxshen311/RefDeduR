@@ -21,7 +21,25 @@ dup_find_fuzzy_adj <- function(
     df_simi,
     cutoff_title = 0.7,
     cutoff_abstract = 0.7
-){
+){# check ----
+  if(missing(df)){
+    stop("'df' is missing: Please provide a data frame.")
+  }
+  if(missing(df_simi)){
+    stop("'df_simi' is missing: Please provide the corresponding data frame with calculated similarity scores.")
+  }
+  if(!all(c("title_simi", "abstract_simi") %in% colnames(df_simi))){
+    stop('Necessary columns are missing.\n
+         Please make sure df_simi has the following columns: c("title_simi", "abstract_simi")')
+  }
+  if(!(cutoff_title >= 0 & cutoff_title <= 1)){
+    stop("Cutoff threshold must be in the range of [0,1].")
+  }
+  if(!(cutoff_abstract >= 0 & cutoff_abstract <= 1)){
+    stop("Cutoff threshold must be in the range of [0,1].")
+  }
+
+
   # Assign numbers ----
   df$match <- integer(nrow(df))
   df$match[1] <- 1
