@@ -25,7 +25,7 @@ simi_edit <- function(a, b){
 #' @keywords internal
 #' @noRd
 simi_edit_pairwise <- function(data, column_name){
-  simi_matrix <- stringsimmatrix(data, method = "lv")
+  simi_matrix <- stringdist::stringsimmatrix(data, method = "lv")
 
   simi_matrix[lower.tri(simi_matrix, diag = TRUE)] <- NA
   simi_matrix_df <- na.omit(data.frame(as.table(simi_matrix)))

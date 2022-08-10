@@ -46,10 +46,7 @@ simi_ptn_pair <- function(
   }
 
 
-  # partition (author not NA) ----
-  # check partition_by
-
-
+  # partition ----
   # treat different partitioning scenarios
   if(partition_by == FALSE){
     df$partition <- as.factor("00")

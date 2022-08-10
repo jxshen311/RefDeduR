@@ -2,8 +2,11 @@
 #'
 #' @description Decisions are made by the decision tree for potential duplicates identified by [RefDeduR::dup_find_fuzzy_adj()].
 #'
-#' Decisions are added to the `"decision"` column in `id_dup_pair`. There are 3 levels of decisions, "duplicate", "not duplicate", and "check". If "not duplicate"...
-#' @param df A data frame (i.e., output #1 of [RefDeduR::dup_find_fuzzy_adj()]).
+#' Decisions are added to the `"decision"` column in `id_dup_pair`. There could be 3 levels of decisions, "duplicate", "not duplicate", and "check". If the decision is "not duplicate", `"match"` column in `df` will be  modified.
+#'
+#' @details See manuscript [//TODO] for details of the decision tree.
+#'
+#' @param df A data frame (i.e., output #1 of [RefDeduR::dup_find_fuzzy_adj()])
 #' @param id_dup_pair A data frame listing `id` of potential duplicate pairs (i.e., output #2 of [RefDeduR::dup_find_fuzzy_adj()])
 #'
 #' @return Two data frames. (1) `df` with `"match"` column modified according to the decision tree; (2) `id_dup_pair` with `"decision"` column added.
