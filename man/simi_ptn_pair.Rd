@@ -24,7 +24,7 @@ The function calculates pairwise similarity based on Levenshtein edit distance f
 \details{
 An artificial code "00" is assigned to cells with missing values in the \code{partition_by} column and these rows are partitioned into one group. If you customize your own partitioning parameter, try to avoid this artificial code.
 
-Computing time estimation according to past experience: ~ 23 min for a data frame with 3837 rows on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
+Computing time estimation according to past experience: ~ 23 min for a data frame with 3837 rows on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB). Consider running it on a high performance computing cluster if you want to shorten the time.
 }
 \examples{
 \dontrun{

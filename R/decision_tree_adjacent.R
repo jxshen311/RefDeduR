@@ -25,8 +25,7 @@ decision_tree_adj <- function(
   id_dup_pair <- id_dup_pair %>% tibble::add_column(decision = NA)
 
 
-  # * remove duplicates + preprints + conference papers ----
-  # ** decision tree
+  # decision tree ----=
   for (ii in 1:nrow(id_dup_pair)){
 
     # extract id of record 1
