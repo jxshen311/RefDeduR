@@ -12,8 +12,8 @@
 #'
 #'
 #' @return
-#' - If `double_check == FALSE`, return `df` with a new column named `"match"`.
-#' - If `double_check == TRUE`, return 2 data frames (`df` and `df_manual_check`). Syntax `%<-%` must be used in this case to have the function return 2 data frames.
+#' - If `double_check == FALSE`, return the input `df` with a new column named `"match"`.
+#' - If `double_check == TRUE`, return 2 data frames (the input `df` and `df_manual_check`). Syntax `%<-%` must be used in this case to have the function return 2 data frames.
 #' @export
 #'
 #' @examples

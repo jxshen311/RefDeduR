@@ -12,7 +12,7 @@ decision_tree_adj(df, id_dup_pair)
 \item{id_dup_pair}{A data frame listing \code{id} of potential duplicate pairs (i.e., output #2 of \code{\link[=dup_find_fuzzy_adj]{dup_find_fuzzy_adj()}})}
 }
 \value{
-Two data frames. (1) \code{df} with \code{"match"} column modified according to the decision tree; (2) \code{id_dup_pair} with \code{"decision"} column added.
+Two data frames: (1) the input \code{df} with \code{"match"} column modified according to the decision tree; (2) the input \code{id_dup_pair} with \code{"decision"} column added.
 }
 \description{
 Decisions are made by the decision tree for potential duplicates identified by \code{\link[=dup_find_fuzzy_adj]{dup_find_fuzzy_adj()}}.

@@ -5,7 +5,7 @@
 #' @param df A data frame with bibliographic information that has gone through text normalization. `df` must have the following columns `c("title_norm", "abstract_norm")`.
 #' @param order_by Quoted name of the column by which to order the rows. Defaults to `"title_norm"`.
 #'
-#' @return Two data frames. (1) Ordered `df`; (2) A data frame with string similarity results for `"title_norm"` and `"abstract_norm"`. Both data frames have a matched `id` column.
+#' @return Two data frames: (1) Ordered `df`; (2) A data frame with string similarity results for `"title_norm"` and `"abstract_norm"`. Both data frames have a matched `id` column.
 #'
 #' @details This function is based on the assumption that all records have titles.
 #'

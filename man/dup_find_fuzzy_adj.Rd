@@ -7,16 +7,16 @@
 dup_find_fuzzy_adj(df, df_simi, cutoff_title = 0.7, cutoff_abstract = 0.7)
 }
 \arguments{
-\item{df}{Ordered data frame (i.e., output #1 of \code{\link[=simi_order_adj]{simi_order_adj()}}).}
+\item{df}{An ordered data frame (i.e., output #1 of \code{\link[=simi_order_adj]{simi_order_adj()}}).}
 
 \item{df_simi}{A data frame with string similarity results calculated from \code{df} (i.e., output #2 of \code{\link[=simi_order_adj]{simi_order_adj()}}).}
 
-\item{cutoff_title}{Cutoff threshold of string similarity for normalized title. Range: [0, 1]. Defaults to 0.7.}
+\item{cutoff_title}{Numeric: cutoff threshold of string similarity for normalized title. Range: [0, 1]. Defaults to 0.7.}
 
-\item{cutoff_abstract}{Cutoff threshold of string similarity for normalized abstract. Range: [0, 1]. Defaults to 0.7.}
+\item{cutoff_abstract}{Numeric: cutoff threshold of string similarity for normalized abstract. Range: [0, 1]. Defaults to 0.7.}
 }
 \value{
-Two data frames. (1) \code{df} with \code{"match"} column added; (2) A data frame listing \code{id} of duplicate pairs.
+Two data frames: (1) the input \code{df} with \code{"match"} column added; (2) A data frame listing \code{id} of duplicate pairs.
 }
 \description{
 Find duplicates by fuzzy match of string similarity between adjacent rows

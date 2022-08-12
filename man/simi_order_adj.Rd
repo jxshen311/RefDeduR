@@ -12,7 +12,7 @@ simi_order_adj(df, order_by = "title_norm")
 \item{order_by}{Quoted name of the column by which to order the rows. Defaults to \code{"title_norm"}.}
 }
 \value{
-Two data frames. (1) Ordered \code{df}; (2) A data frame with string similarity results for \code{"title_norm"} and \code{"abstract_norm"}. Both data frames have a matched \code{id} column.
+Two data frames: (1) Ordered \code{df}; (2) A data frame with string similarity results for \code{"title_norm"} and \code{"abstract_norm"}. Both data frames have a matched \code{id} column.
 }
 \description{
 The function calculates similarity based on Levenshtein edit distance for columns \code{"title_norm"} and \code{"abstract_norm"} between adjacent rows. Range of similarity is [0, 1]. \code{Similarity == 1} means 100\% identical while \code{Similarity == 0} means completely different.

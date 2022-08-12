@@ -24,6 +24,14 @@ knitr::opts_chunk$set(eval = FALSE)  # temporary command; to disable the code ch
 
 ## Introduction
 
+
+#//TODO: to re-edit
+{
+We recommend treating these as modules. we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
+
+with the finely tuned text cleaning and normalization, even just exact match out competes many tools - alphabetic order is also very fast
+}
+
 ## Example dataset
 
 We use an example dataset to demonstrate the recommended pipeline of RefDeduR. The dataset contains all bibliographic records (n = 6384) retrieved in a systematic review on indoor surface microbiome studies. The systematic search was conducted on 2022-01-10 through 3 platforms (i.e., PubMed, Web of Science, and Scopus).
@@ -135,7 +143,7 @@ We propose two strategies to address these challenges correspondingly.
 
 1.  We examine the similarity distribution plots and use the inflection point of the curve as the sensible cutoff threshold. This is a dataset-aware method, and it also allows fine-tuning of the cutoff threshold.
 
-2.  We introduce a decision tree that incorporates multiple fields to automate the "manual review" step. This is especially helpful for large datasets, in which case the number of duplicate sets requiring manual review could be unfeasibly high (e.g., revtools output ~1,400 duplicate sets for manual confirmation when treating this example dataset).
+2.  We introduce a decision tree that incorporates multiple fields to automate the "manual review" step. This is especially helpful for large datasets, in which case the number of duplicate sets requiring manual review could be unfeasibly high (e.g., revtools output \~1,400 duplicate sets for manual confirmation when treating this example dataset).
 
 To improve the computational efficiency, we divide this process into 2 steps: (1) order the records alphabetically according to `title_norm` and compare only between the adjacent rows; (2) perform pairwise comparisons between records within the same group partitioned by the first 2 letters of `first_author_last_name_norm`.
 
@@ -166,13 +174,14 @@ According to the plots, 0.7 or 0.6 seems sensible cutoff threshold. For demonstr
 c(b2, id_dup_pair_adj) %<-% dup_find_fuzzy_adj(b2, b2_simi, cutoff_title = 0.6, cutoff_abstract = 0.6)
 ```
 
-Per the 2nd strategy, we introduce the decision tree to semi-automate the "manual review" step. Decisions are added to the `"decision"` column in `id_dup_pair`. There could be 3 levels of decisions, "duplicate", "not duplicate", and "check". If the decision is "not duplicate", `"match"` column in `df` will be  modified. To ensure a high accuracy, especially a low false positive rate, output "check" is kept in the decision tree.
+Per the 2nd strategy, we introduce the decision tree to semi-automate the "manual review" step. Decisions are added to the `"decision"` column in `id_dup_pair`. There could be 3 levels of decisions, "duplicate", "not duplicate", and "check". If the decision is "not duplicate", `"match"` column in `df` will be modified. To ensure a high accuracy, especially a low false positive rate, output "check" is kept in the decision tree.
 
 ```{r}
 c(b2, id_dup_pair_adj) %<-% decision_tree_adj(b2, id_dup_pair_adj)
 ```
 
 Once we get the algorithm-generated decisions, we can deduplicate accordingly for different scenarios.
+
 ```{r}
 # For the "duplicate", we can just deduplicate by `dup_rm_adj()`. 
 b2_inter <- dup_rm_adj(b2, id_dup_pair_adj)
@@ -191,21 +200,80 @@ b3 <- select(b3, -c(id, match, matches))
 
 ### Step 2: partition + pairwise
 
-We further look for potential duplicates according to pairwise string similarity between records within the same partitioned group for columns `"title_norm"` and `"abstract_norm"`. 
+We further look for potential duplicates according to pairwise string similarity between all records within the same partitioned group for columns `"title_norm"` and `"abstract_norm"`.
 
-By default, we partition the dataset by the first 2 letters of `first_author_last_name_norm`. This is more efficient than another popular partitioning parameter - year -  for datasets that are skewed towards recent years. Additionally, with the prevalence of preprints, partitioning by `"year"` becomes less accurate. Nevertheless, you can customize the partitioning parameter by preference.
+By default, we partition the dataset by the first 2 letters of `first_author_last_name_norm`. This is more efficient than another popular partitioning parameter - year - for datasets that are skewed towards recent years. Additionally, with the prevalence of preprints, partitioning by `"year"` becomes less accurate. Nevertheless, you can customize the partitioning parameter by preference.
 
-Following a pipeline similar to that at step 1, we first calculate string similarity. Because we partition the dataset, results are now stored in lists (as compared to data frames at step 1).
+Following a pipeline similar to that in step 1, we first calculate string similarity. Because we partition the dataset, results are now stored in lists (as compared to data frames in step 1).
+
 ```{r}
 c(ls_b3, ls_b3_simi) %<-% simi_ptn_pair(b3, partition_by = "first_two_letters_first_author_last_name")
-# Computing time estimation:  for this data frame ( rows) on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
+# Computing time estimation: ~ 23 min for this data frame (3832 rows) on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB). You can consider running it on a high performance computing cluster if shortening the running time is of high priority.
+```
+
+Then we find potential duplicates.
+
+```{r}
+id_dup_pair_pairwise <- dup_find_fuzzy_pairwise(ls_b3, ls_b3_simi, cutoff_title = 0.6, cutoff_abstract = 0.6)
+```
+
+> 🗒️ Cutoff thresholds in `dup_find_fuzzy_adj()` are usually applicable here. Alternatively, you can re-examine the similarity distribution plots by `plot_simi_dist()` and choose sensible values. Example commands are shown below.
+>
+> ```{r}
+> # Merge similarity list into a data frame
+> b3_plot <- do.call("rbind", ls_b3_simi)
+> rownames(b3_plot) <- NULL
+> b3_plot <- tibble::rownames_to_column(b3_plot, var = "id")
+> >
+> # Plot: Distribution of similarity scores based on normalized title
+> p_b3_ti <- plot_simi_dist(b3_plot, "title_simi")
+> p_b3_ti  # show plot in the Plots tab
+> >
+> # Plot: Distribution of similarity scores based on normalized abstract
+> p_b3_ab <- plot_simi_dist(b3_plot, "abstract_simi")
+> p_b3_ab  # show plot in the Plots tab
+> ```
+
+We apply the decision tree to potential duplicates.
+
+```{r}
+id_dup_pair_pairwise <- decision_tree_pairwise(ls_b3, id_dup_pair_pairwise)
+```
+
+For the duplicate pairs with a "check" decision, we output them into a data frame for manual review.
+
+```{r}
+df_check_pairwise <- dup_screen_pairwise(ls_b3, id_dup_pair_pairwise)
+```
+
+Similarly, we can either (1) review them directly in a data frame format (e.g., preview in R or write.xlsx()) or (2) call revtools shiny app for visulization, by `revtools::screen_duplicates(df_check_pairwise)`. However, we don't resolve duplicates directly in the revtools shiny app. Instead, we use `dup_resolve_pairwise()` to change decisions from "check" to "duplicate" or "not duplicate" according to manual review results.
+
+```{r}
+# All 4 duplicate pairs in this example dataset are "not duplicate".
+id_dup_pair_pairwise <- dup_resolve_pairwise(
+  id_dup_pair_pairwise,
+  df_check_pairwise,
+  match_index = c(1, 2, 3, 4),
+  result = "not duplicate")
+```
+
+Afterwards, we remove duplicates by `dup_rm_pairwise()`. 
+
+```{r}
+b4 <- dup_rm_pairwise(ls_b3, id_dup_pair_pairwise, to_dataframe = TRUE)
+
+# remove helper columns
+b4 <- select(b4, -id, -partition)
+```
+
+# Export the deduplicated dataset to .bib or .ris formats
+
+```{r}
+revtools::write_bibliography(b4, "inst/extdata/dataset_deduplicated.ris", format = "ris")  # export .ris
+# or export .bib
+#// revtools::write_bibliography(b4, "inst/extdata/dataset_deduplicated.bib", format = "bib")  
+
+# Alternative function: synthesisr::write_refs()
 ```
 
 
-
-
-## recommendation
-
-treat these as modules, we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
-
-with the finely tuned text cleaning and normalization, even just exact match out competes many tools - alphabetic order is also very fast

@@ -16,9 +16,9 @@ dup_find_fuzzy_pairwise(
 
 \item{ls_df_simi}{A list of data frames with string similarity results calculated (i.e., output #2 of \code{\link[=simi_ptn_pair]{simi_ptn_pair()}}).}
 
-\item{cutoff_title}{Cutoff threshold of string similarity for normalized title. Range: [0, 1]. Defaults to 0.7.}
+\item{cutoff_title}{Numeric: cutoff threshold of string similarity for normalized title. Range: [0, 1]. Defaults to 0.7.}
 
-\item{cutoff_abstract}{Cutoff threshold of string similarity for normalized abstract. Range: [0, 1]. Defaults to 0.7.}
+\item{cutoff_abstract}{Numeric: cutoff threshold of string similarity for normalized abstract. Range: [0, 1]. Defaults to 0.7.}
 }
 \value{
 A data frame listing record id and partition id of duplicate pairs.

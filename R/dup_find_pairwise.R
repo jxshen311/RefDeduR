@@ -3,9 +3,9 @@
 #' @param ls_df A list of data frames containing the partitioned dataset  (i.e., output #1 of [RefDeduR::simi_ptn_pair()]).
 #' @param ls_df_simi A list of data frames with string similarity results calculated (i.e., output #2 of [RefDeduR::simi_ptn_pair()]).
 #'
-#' @param cutoff_title Cutoff threshold of string similarity for normalized title. Range: \[0, 1\]. Defaults to 0.7.
+#' @param cutoff_title Numeric: cutoff threshold of string similarity for normalized title. Range: \[0, 1\]. Defaults to 0.7.
 #'
-#' @param cutoff_abstract Cutoff threshold of string similarity for normalized abstract. Range: \[0, 1\]. Defaults to 0.7.
+#' @param cutoff_abstract Numeric: cutoff threshold of string similarity for normalized abstract. Range: \[0, 1\]. Defaults to 0.7.
 #'
 #' @details **For both cutoffs:**
 #'
@@ -46,7 +46,7 @@ dup_find_fuzzy_pairwise <- function(
     stop("Cutoff threshold must be in the range of [0,1].")
   }
 
-  ## extract ID ----
+  # extract ID ----
   id_dup_pair <- data.frame()
 
   for (ii in 1:length(ls_df)){

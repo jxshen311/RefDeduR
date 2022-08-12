@@ -22,8 +22,8 @@ dup_find_exact(
 }
 \value{
 \itemize{
-\item If \code{double_check == FALSE}, return \code{df} with a new column named \code{"match"}.
-\item If \code{double_check == TRUE}, return 2 data frames (\code{df} and \code{df_manual_check}). Syntax \verb{\%<-\%} must be used in this case to have the function return 2 data frames.
+\item If \code{double_check == FALSE}, return the input \code{df} with a new column named \code{"match"}.
+\item If \code{double_check == TRUE}, return 2 data frames (the input \code{df} and \code{df_manual_check}). Syntax \verb{\%<-\%} must be used in this case to have the function return 2 data frames.
 }
 }
 \description{

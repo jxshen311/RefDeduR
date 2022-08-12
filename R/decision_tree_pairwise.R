@@ -3,7 +3,7 @@
 #' @param ls_df A list of data frames containing the partitioned dataset  (i.e., output #1 of [RefDeduR::simi_ptn_pair()]).
 #' @param id_dup_pair A data frame listing record id and partition id of duplicate pairs (i.e., output of [RefDeduR::dup_find_fuzzy_pairwise()]).
 #'
-#' @return `id_dup_pair` with `"decision"` column added.
+#' @return The input `id_dup_pair` with `"decision"` column added.
 #' @export
 #'
 #' @examples

@@ -12,7 +12,7 @@ decision_tree_pairwise(ls_df, id_dup_pair)
 \item{id_dup_pair}{A data frame listing record id and partition id of duplicate pairs (i.e., output of \code{\link[=dup_find_fuzzy_pairwise]{dup_find_fuzzy_pairwise()}}).}
 }
 \value{
-\code{id_dup_pair} with \code{"decision"} column added.
+The input \code{id_dup_pair} with \code{"decision"} column added.
 }
 \description{
 Make decisions for potential duplicates

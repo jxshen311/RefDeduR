@@ -9,7 +9,7 @@
 #' @param df A data frame (i.e., output #1 of [RefDeduR::dup_find_fuzzy_adj()])
 #' @param id_dup_pair A data frame listing `id` of potential duplicate pairs (i.e., output #2 of [RefDeduR::dup_find_fuzzy_adj()])
 #'
-#' @return Two data frames. (1) `df` with `"match"` column modified according to the decision tree; (2) `id_dup_pair` with `"decision"` column added.
+#' @return Two data frames: (1) the input `df` with `"match"` column modified according to the decision tree; (2) the input `id_dup_pair` with `"decision"` column added.
 #' @export
 #'
 #' @examples

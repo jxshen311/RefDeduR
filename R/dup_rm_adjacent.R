@@ -5,7 +5,7 @@
 #' @param df A data frame (i.e., output #1 of [RefDeduR::decision_tree_adj()])
 #' @param id_dup_pair A data frame listing `id` of potential duplicate pairs (i.e., output #2 of [RefDeduR::decision_tree_adj()])
 #'
-#' @return `df` with duplicates removed
+#' @return The input `df` with duplicates removed.
 #' @export
 #'
 #' @examples

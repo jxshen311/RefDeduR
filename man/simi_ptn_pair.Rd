@@ -16,7 +16,7 @@ Besides the default, \code{"year"} is another popular partitioning parameter. We
 In addition, you can also construct a custom "partition" column.}
 }
 \value{
-Two list of data frames. (1) A list of data frames containing the partitioned \code{df}; (2) A list of data frames with string similarity results for \code{"title_norm"} and \code{"abstract_norm"}.
+Two list of data frames: (1) A list of data frames containing the partitioned \code{df}; (2) A list of data frames with string similarity results for \code{"title_norm"} and \code{"abstract_norm"}.
 }
 \description{
 The function calculates pairwise similarity based on Levenshtein edit distance for columns \code{"title_norm"} and \code{"abstract_norm"} between records within the same group after partitioning. Range of similarity is [0, 1]. \code{Similarity == 1} means 100\% identical while \code{Similarity == 0} means completely different.
@@ -24,7 +24,7 @@ The function calculates pairwise similarity based on Levenshtein edit distance f
 \details{
 An artificial code "00" is assigned to cells with missing values in the \code{partition_by} column and these rows are partitioned into one group. If you customize your own partitioning parameter, try to avoid this artificial code.
 
-Computing time estimation according to past experience: ~ 23 min for a data frame with 3837 rows on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB). Consider running it on a high performance computing cluster if you want to shorten the time.
+Computing time estimation according to past experience: ~ 23 min for a data frame with 3832 rows on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB). Consider running it on a high performance computing cluster if you want to shorten the time.
 }
 \examples{
 \dontrun{

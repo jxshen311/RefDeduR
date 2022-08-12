@@ -12,7 +12,7 @@ dup_rm_adj(df, id_dup_pair)
 \item{id_dup_pair}{A data frame listing \code{id} of potential duplicate pairs (i.e., output #2 of \code{\link[=decision_tree_adj]{decision_tree_adj()}})}
 }
 \value{
-\code{df} with duplicates removed
+The input \code{df} with duplicates removed.
 }
 \description{
 This function ensures that the most recent record be kept. When a peer-reviewed publication co-exists with a preprint or a conference proceeding, the peer-reviewed version will be kept.
