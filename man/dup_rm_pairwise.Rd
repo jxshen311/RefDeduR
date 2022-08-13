@@ -17,7 +17,7 @@ dup_rm_pairwise(ls_df, id_dup_pair, to_dataframe = TRUE)
 The input \code{ls_df} with duplicates removed. The resulted list of data frames are merged into a single data frame if \code{to_dataframe == TRUE}. Otherwise, a list of data frames is returned.
 }
 \description{
-Remove duplicates in pairwise comparison
+This function ensures that the most recent record be kept. When a peer-reviewed publication co-exists with a preprint or a conference proceeding, the peer-reviewed version will be kept.
 }
 \examples{
 \dontrun{

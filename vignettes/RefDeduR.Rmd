@@ -38,7 +38,10 @@ We use an example dataset to demonstrate the recommended pipeline of RefDeduR. T
 
 #//TODO: add info (1. preprocessing; 2. `bib_example_complete`)
 
-## Pre-process
+## Pre-processing: transliterate non-ASCII characters
+
+The transliteration process includes 2 parts: (1) transliterate greek letters to alphabets (e.g., β to beta, α to alpha) and (2) accented characters to ASCII characters (e.g., á to a, ä to a) using library "unidecode" in python.
+
 
 ## Read bibliographic files into a data frame
 
