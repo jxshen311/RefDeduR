@@ -19,6 +19,7 @@ Imports:
     reshape2,
     revtools,
     stringdist,
+    stringi,
     stringr,
     tibble,
     tidyr,
