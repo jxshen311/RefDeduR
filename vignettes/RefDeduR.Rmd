@@ -24,41 +24,63 @@ knitr::opts_chunk$set(eval = FALSE)  # temporary command; to disable the code ch
 
 ## Introduction
 
+#//TODO: to re-edit { We recommend treating these as modules. we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
 
-#//TODO: to re-edit
-{
-We recommend treating these as modules. we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
+with the finely tuned text cleaning and normalization, even just exact match out competes many tools - alphabetic order is also very fast }
 
-with the finely tuned text cleaning and normalization, even just exact match out competes many tools - alphabetic order is also very fast
-}
+**✏️*If you use RefDeduR, please cite:***
 
 ## Example dataset
 
 We use an example dataset to demonstrate the recommended pipeline of RefDeduR. The dataset contains all bibliographic records (n = 6384) retrieved in a systematic review on indoor surface microbiome studies. The systematic search was conducted on 2022-01-10 through 3 platforms (i.e., PubMed, Web of Science, and Scopus).
 
-#//TODO: add info (1. preprocessing; 2. `bib_example_complete`)
-
 ## Pre-processing: transliterate non-ASCII characters
 
-The transliteration process includes 2 parts: (1) transliterate greek letters to alphabets (e.g., β to beta, α to alpha) and (2) accented characters to ASCII characters (e.g., á to a, ä to a) using library "unidecode" in python.
+The transliteration process includes 2 parts: (1) transliterate common Greek letters to their names (e.g., α to alpha, β to beta) and (2) transliterate accented characters to ASCII characters (e.g., á to a, ä to a).
 
-
-## Read bibliographic files into a data frame
-
-We use function `revtools::read_bibliography()` to read bibTex file into a data frame.
-
--   I recommend using bibTex files here. According to past experience, reading .ris file seems to have formatting errors.
--   Alternative function: `synthesisr::read_refs()`
+**Rationale:** This increases the chance of successful deduplication by exact match. This also reduces noises when partitioning the dataset by the first 2 letters of `first_author_last_name_norm` at the fuzzy match step. For example, a record titled "Carriage and population genetics of extended spectrum **β**-lactamase-producing Escherichia coli in cats and dogs in New Zealand" sometimes has a title "Carriage and population genetics of extended spectrum **beta**-lactamase-producing Escherichia coli in cats and dogs in New Zealand". Author names "Álvarez-Fraga, L. and Pérez, A." are sometimes "Alvarez-Fraga, L. and Perez, A.".
 
 ```{r}
-# Output the path to the example dataset
-path_to_bibfile <- system.file("extdata", "dataset_trans_unaccented.bib", package = "RefDeduR")
+# Get the path to the example dataset
+input_file <- system.file("extdata", "dataset_raw.bib", package = "RefDeduR")
 
-# Print the path to confirm
-print(path_to_bibfile)
+# Specify the path to the output file. Here I put it in the same directory but you can modify the path to wherever you want to store the output file.
+transliterated_file <- system.file("extdata", "dataset_transliterated.bib", package = "RefDeduR")
 
-# Read bibTex file into a data frame
-b <- revtools::read_bibliography(path_to_bibfile) # 6384 rows
+norm_transliteration(input_file, transliterated_file, method = c("greek_letter-name", "any-ascii"))
+```
+
+> ⚒️ ***Alternatively***, python scripts developed on the basis of `unidecode` package are provided. The scripts are ready to be run in terminal. Performance of the R function and the python scripts are generally similar, with only little difference induced by the difference of R package `stringi` and python package `unidecode`.
+>
+> ```{bash}
+> # Transliterate common Greek letters to their names
+> python transliteration_greek_to_name.py <path/to/input_file> <path/to/output_file>
+>
+> # Transliterate accented characters to ASCII characters 
+> python transliteration_unaccent.py <path/to/input_file> <path/to/output_file>
+> ```
+
+## Read the bibliographic file into a data frame
+
+We use function `revtools::read_bibliography()` to read the transliterated bibTex file into a data frame.
+
+-   I recommend using bibTex files here. According to past experience, reading .ris file seems to have formatting errors.
+
+-   Alternative function: `synthesisr::read_refs()`
+
+-   <div>
+
+    🗒️ [*Comparison of the two import functions:*]{.underline}
+
+    `synthesisr::read_refs()` seems better at parsing special characters. "β-α-β" can be retained, while the text becomes "Î²-Î±-Î²" when using `revtools::read_bibliography()`. However, a potential benefit of `revtools::read_bibliography()` is that it keeps the citation key (e.g., "RN13774" in the first row of record "@article{RN13774,") in a column named "label". If the .bib file is exported from Endnote (the case of this example dataset), this citation key can serve as a unique identifier. This information is also preserved in Covidence export. Covidence is an online systematic review management platform, which is a typical downstream step following reference deduplication. If preserving the citation key (or a unique identifier) across processes is desired, consider switching to `revtools::read_bibliography()` or importing twice with both functions and combine the data frames.
+
+    </div>
+
+Here we use `revtools::read_bibliography()` because we have transliterated the Greek letters and I want the unique identifier.
+
+```{r}
+# Read the transliterated bibTex file into a data frame
+b <- revtools::read_bibliography(transliterated_file)  # 6384 rows
 
 # We can check the number of missing values in each column.
 # Pay attention to `title` column as we expect all records to have titles.
@@ -260,7 +282,7 @@ id_dup_pair_pairwise <- dup_resolve_pairwise(
   result = "not duplicate")
 ```
 
-Afterwards, we remove duplicates by `dup_rm_pairwise()`. 
+Afterwards, we remove duplicates by `dup_rm_pairwise()`.
 
 ```{r}
 b4 <- dup_rm_pairwise(ls_b3, id_dup_pair_pairwise, to_dataframe = TRUE)
@@ -275,8 +297,8 @@ b4 <- select(b4, -id, -partition)
 revtools::write_bibliography(b4, "inst/extdata/dataset_deduplicated.ris", format = "ris")  # export .ris
 # or export .bib
 #// revtools::write_bibliography(b4, "inst/extdata/dataset_deduplicated.bib", format = "bib")  
-
-# Alternative function: synthesisr::write_refs()
 ```
 
+Alternative function: `synthesisr::write_refs()`. According to my observation, `revtools::write_bibliography()` seems to preserve more fields in the exported file, but it's always a good idea to test both functions on your own dataset.
 
+> 🗒️ We export .ris file here because the downstream applications (e.g., I tested Covidence , Rayyan, and Endnote) in my pipeline seem easier to recognize a .ris file than a .bib file.

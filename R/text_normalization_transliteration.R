@@ -4,16 +4,15 @@
 #'
 #' @param file_input Directory/Path to the input file.
 #' @param file_output Directory/Path to the out file. No need to create the file in advance. A file with the specified name will be created.
-#' @param method A character vector specifying the transliteration rules in order. Defaults to a recommended rule combination - `c("greek_letter-name", "any-ascii")`. See [stringi::stri_trans_general()] documentation for more rules in the database. Customized rules are also allowed (see examples).
-#' @param customized Logical. A logical vector (with the same length as `method`) specifying whether the corresponding transliteration rule is a customized rule or not. *Optional if none of the rules is customized (i.e., Defaults to an all-FALSE vector.).*
+#' @param method A character vector specifying the transliteration rules in order. Defaults to a recommended rule combination - `c("greek_letter-name", "any-ascii")`. See [stringi::stri_trans_general()] documentation for more rules in the database. Custom rules are also allowed (see examples).
+#' @param custom Logical. A logical vector (with the same length as `method`) specifying whether the corresponding transliteration rule is a custom rule or not. *Optional if none of the rules is custom (i.e., Defaults to an all-FALSE vector.).*
 #'
-#' @details Transliteration rule **`"greek_letter-name"`** transliterates common greek letters to their names (e.g., α to alpha, β to beta). See [RefDeduR::ls_greek_letter_to_name()] for the list of transformations.
+#' @details Transliteration rule **`"greek_letter-name"`** transliterates common Greek letters to their names (e.g., α to alpha, β to beta). See [RefDeduR::ls_greek_letter_to_name()] for the complete list of transformations.
 #'
-#'#//TODO: finish details: explain the recommended rules, write documents for ls_greek_letter_to_name
+#' This function is mainly based on [stringi::stri_trans_general()], thus all rules in [stringi::stri_trans_general()] are applicable as rules in `method` here. For example, `"any-ascii"` is to transform all scripts to ASCII format. See [stringi::stri_trans_general()] documentation for more details.
 #'
-#' All rules in [stringi::stri_trans_general()] are applicable as a rule in `method` here. documentation for more rules in the database. Customized rules are also allowed (see examples).
+#' See Example 3 and the last example in [stringi::stri_trans_general()] for instructions to construct **custom rules**.
 #'
-#' rule explanation
 #'
 #'
 #' @return NULL
@@ -48,13 +47,14 @@
 #' #> Ϛ
 #'
 #'
-#' # Example 3: use customized transliteration rules
+#' # Example 3: use custom transliteration rules
 #' id_custom <- "
 #' \u03DA > 'Stigma';
 #' \u03E0 > 'Sampi';
-#' "  # Note that every transliteration needs to be accompanied by a semicolon, including the last line.
+#' "
+#' # Note that every transliteration needs to be accompanied by a semicolon, including the last line.
 #'
-#' norm_transliteration(input, output, method = c("greek_letter-name", id_custom, "any-ascii"), customized = c(FALSE, TRUE, FALSE))
+#' norm_transliteration(input, output, method = c("greek_letter-name", id_custom, "any-ascii"), custom = c(FALSE, TRUE, FALSE))
 #' # For demonstration purpose, output.bib will look like this.
 #' #> author = {Whitman, C. P., Alvarez-Fraga, L. and Perez, A a a},
 #' #> title = {beta-alpha-beta structural motif},
@@ -63,8 +63,8 @@
 norm_transliteration <- function(
     file_input,
     file_output,
-    method = c("greek_letter-name", "any-ascii"), # in order; could input customized rules
-    customized
+    method = c("greek_letter-name", "any-ascii"), # in order; could input custom rules
+    custom
 ){# check ----
   if(!inherits(method, "character")){
     stop("'method' must be a character vector.")
@@ -74,12 +74,12 @@ norm_transliteration <- function(
   fout  <- file(file_output, open = "w")
 
   # construct id
-  if(missing(customized)){
-    customized <- rep(FALSE, length(method))
-  } else if(!inherits(customized, "logical")){
-    stop("'customized' must be a logical vector.")
-  } else if(length(customized) != length(method)){
-      stop("Lengths of 'method' and 'customized' must be the same.")
+  if(missing(custom)){
+    custom <- rep(FALSE, length(method))
+  } else if(!inherits(custom, "logical")){
+    stop("'custom' must be a logical vector.")
+  } else if(length(custom) != length(method)){
+      stop("Lengths of 'method' and 'custom' must be the same.")
     }
 
   id_greek_letter_name <- "
@@ -138,11 +138,11 @@ norm_transliteration <- function(
   id <- character()
 
   for (ii in 1:length(method)){
-    if(method[ii] == "greek_letter-name" & customized[ii] == FALSE){
+    if(method[ii] == "greek_letter-name" & custom[ii] == FALSE){
       id_append <- id_greek_letter_name
-    } else if(customized[ii] == FALSE){
+    } else if(custom[ii] == FALSE){
       id_append <- paste0(":: ", method[ii], ";")
-    } else if(customized[ii] == TRUE){
+    } else if(custom[ii] == TRUE){
       id_append <- method[ii]
     }
 

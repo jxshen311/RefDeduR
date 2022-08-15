@@ -8,7 +8,7 @@ norm_transliteration(
   file_input,
   file_output,
   method = c("greek_letter-name", "any-ascii"),
-  customized
+  custom
 )
 }
 \arguments{
@@ -16,10 +16,59 @@ norm_transliteration(
 
 \item{file_output}{Directory/Path to the out file. No need to create the file in advance. A file with the specified name will be created.}
 
-\item{method}{A character vector specifying the transliteration rules in order. Defaults to a recommended rule combination - \code{c("greek_letter-name", "any-ascii")}. See \code{\link[stringi:stri_trans_general]{stringi::stri_trans_general()}} documentation for more rules in the database. Customized rules are also allowed (see examples).}
+\item{method}{A character vector specifying the transliteration rules in order. Defaults to a recommended rule combination - \code{c("greek_letter-name", "any-ascii")}. See \code{\link[stringi:stri_trans_general]{stringi::stri_trans_general()}} documentation for more rules in the database. Custom rules are also allowed (see examples).}
 
-\item{customized}{Logical. A logical vector (with the same length as \code{method}) specifying whether the corresponding transliteration rule is a customized rule or not. \emph{Optional if none of the rules is customized (i.e., Defaults to an all-FALSE vector.).}}
+\item{custom}{Logical. A logical vector (with the same length as \code{method}) specifying whether the corresponding transliteration rule is a custom rule or not. \emph{Optional if none of the rules is custom (i.e., Defaults to an all-FALSE vector.).}}
 }
 \description{
 Transliterate a text file and output to another text file.
+}
+\details{
+Transliteration rule \strong{\code{"greek_letter-name"}} transliterates common Greek letters to their names (e.g., α to alpha, β to beta). See \code{\link[=ls_greek_letter_to_name]{ls_greek_letter_to_name()}} for the complete list of transformations.
+
+All rules in \code{\link[stringi:stri_trans_general]{stringi::stri_trans_general()}} are applicable as a rule in \code{method} here. For example, \code{"any-ascii"} is to transform all scripts to ASCII format. See \code{\link[stringi:stri_trans_general]{stringi::stri_trans_general()}} documentation for more details.
+
+See \strong{Example 3} and the last example in \code{\link[stringi:stri_trans_general]{stringi::stri_trans_general()}} for instrucstions to construct custom rules.
+}
+\examples{
+# An example input file has been put in extdata/
+# We use system.file() to output the path to this example file
+input <- system.file("extdata", "example_norm_trans.bib", package = "RefDeduR")
+# The input file looks like this.
+#> author = {Whitman, C. P., Álvarez-Fraga, L. and Pérez, A á ä},
+#> title = {β-α-β structural motif},
+#> Ϛ
+
+# Specify the path to the output file. Here I put it in the same directory but you can modify the path to wherever you want to store the output file.
+output <- system.file("extdata", "output.bib", package = "RefDeduR")
+
+
+# Example 1: default setting
+norm_transliteration(input, output, method = c("greek_letter-name", "any-ascii"))
+# For demonstration purpose, output.bib will look like this.
+#> author = {Whitman, C. P., Alvarez-Fraga, L. and Perez, A a a},
+#> title = {beta-alpha-beta structural motif},
+#> Ϛ
+
+
+# Example 2: use other transliteration rules in the database
+norm_transliteration(input, output, method = c("Greek-en_US/UNGEGN", "any-ascii"))
+# For demonstration purpose, output.bib will look like this.
+#> author = {Whitman, C. P., Alvarez-Fraga, L. and Perez, A a a},
+#> title = {b-a-b structural motif},
+#> Ϛ
+
+
+# Example 3: use custom transliteration rules
+id_custom <- "
+\u03DA > 'Stigma';
+\u03E0 > 'Sampi';
+"  # Note that every transliteration needs to be accompanied by a semicolon, including the last line.
+
+norm_transliteration(input, output, method = c("greek_letter-name", id_custom, "any-ascii"), custom = c(FALSE, TRUE, FALSE))
+# For demonstration purpose, output.bib will look like this.
+#> author = {Whitman, C. P., Alvarez-Fraga, L. and Perez, A a a},
+#> title = {beta-alpha-beta structural motif},
+#> Stigma
+
 }

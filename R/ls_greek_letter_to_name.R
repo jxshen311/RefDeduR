@@ -1,3 +1,10 @@
+#' A complete list of transformations for the transliteration rule `"greek_letter-name"`
+#'
+#' @return A one-length character containing the complete list of transformations.
+#' @export
+#'
+#' @examples
+#' ls_greek_letter_to_name()
 ls_greek_letter_to_name <- function(){
   id_greek_letter_name <- "
   \u0391 > 'Alpha';
