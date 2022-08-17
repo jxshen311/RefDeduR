@@ -1,0 +1,45 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# RefDeduR <a href=''><img src="man/figures/RefDeduR_logo.png" align="right" height="139"/></a>
+
+`r badger::badge_github_actions("rossellhayes/ipa")` `r badger::badge_license("GPL3.0")` `r badger::badge_devel("jxshen311/RefDeduR", "green")`
+
+The goal of RefDeduR is to ...
+
+## Author
+
+Jiaxian Shen
+
+Department of Civil and Environmental Engineering, Northwestern University
+
+`r badger::badge_custom("follow me on", "Twitter", "blue", "https://twitter.com/shen_jiaxian")`
+
+## Installation
+
+You can install the development version of RefDeduR from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("jxshen311/RefDeduR")
+```
+
+## Tutorial and Example
+
+For a step-by-step tutorial with an example dataset, see <//TODO: link to the vignette>
+
+## Acknowledgement
+
+We thank Ahmad Roaayala, Eko Purnomo, and Vectors Point from Noun Project for allowing us to use the following icons [Research Paper](https://thenounproject.com/icon/research-paper-3587992/), [Report Paper](https://thenounproject.com/icon/report-paper-3587986/), [report](https://thenounproject.com/icon/report-4520807/), and [Stats Report](https://thenounproject.com/icon/stats-report-3262083/) to create the logo.

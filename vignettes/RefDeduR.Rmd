@@ -55,7 +55,7 @@ norm_transliteration(input_file, transliterated_file, method = c("greek_letter-n
 > ```{bash}
 > # Transliterate common Greek letters to their names
 > python transliteration_greek_to_name.py <path/to/input_file> <path/to/output_file>
->
+> >
 > # Transliterate accented characters to ASCII characters 
 > python transliteration_unaccent.py <path/to/input_file> <path/to/output_file>
 > ```
