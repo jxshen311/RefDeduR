@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# RefDeduR <a href=''><img src="man/figures/RefDeduR_logo.png" align="right" height="139"/></a>
+# RefDeduR <a href=''><img src="man/figures/RefDeduR_logo.jpg" align="right" height="139"/></a>
 
 [![R build
 status](https://github.com/rossellhayes/ipa/workflows/R-CMD-check/badge.svg)](https://github.com/rossellhayes/ipa/actions)
