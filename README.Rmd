@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# RefDeduR <a href=''><img src="man/figures/RefDeduR_logo.jpg" align="right" height="139"/></a>
+# RefDeduR <a href=''><img src="man/figures/RefDeduR_logo.png" align="right" height="139"/></a>
 
 `r badger::badge_github_actions("rossellhayes/ipa")` `r badger::badge_license("GPL3.0")` `r badger::badge_devel("jxshen311/RefDeduR", "green")`
 
