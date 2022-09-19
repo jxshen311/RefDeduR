@@ -26,7 +26,7 @@ knitr::opts_chunk$set(eval = FALSE)  # temporary command; to disable the code ch
 
 #//TODO: to re-edit { We recommend treating these as modules. we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
 
-with the finely tuned text cleaning and normalization, even just exact match out competes many tools - alphabetic order is also very fast }
+with the finely tuned text cleaning and normalization, even just exact matching out competes many tools - alphabetic order is also very fast }
 
 **✏️*If you use RefDeduR, please cite:***
 
@@ -38,7 +38,7 @@ We use an example dataset to demonstrate the recommended pipeline of RefDeduR. T
 
 The transliteration process includes 2 parts: (1) transliterate common Greek letters to their names (e.g., α to alpha, β to beta) and (2) transliterate accented characters to ASCII characters (e.g., á to a, ä to a).
 
-**Rationale:** This increases the chance of successful deduplication by exact match. This also reduces noises when partitioning the dataset by the first 2 letters of `first_author_last_name_norm` at the fuzzy match step. For example, a record titled "Carriage and population genetics of extended spectrum **β**-lactamase-producing Escherichia coli in cats and dogs in New Zealand" sometimes has a title "Carriage and population genetics of extended spectrum **beta**-lactamase-producing Escherichia coli in cats and dogs in New Zealand". Author names "Álvarez-Fraga, L. and Pérez, A." are sometimes "Alvarez-Fraga, L. and Perez, A.".
+**Rationale:** This increases the chance of successful deduplication by exact matching. This also reduces noises when partitioning the dataset by the first 2 letters of `first_author_last_name_norm` at the fuzzy matching step. For example, a record titled "Carriage and population genetics of extended spectrum **β**-lactamase-producing Escherichia coli in cats and dogs in New Zealand" sometimes has a title "Carriage and population genetics of extended spectrum **beta**-lactamase-producing Escherichia coli in cats and dogs in New Zealand". Author names "Álvarez-Fraga, L. and Pérez, A." are sometimes "Alvarez-Fraga, L. and Perez, A.".
 
 ```{r}
 # Get the path to the example dataset
@@ -90,7 +90,7 @@ colSums(is.na(b))
 
 ## Text cleaning and normalization
 
-Before deduplication, we first apply multiple fine text cleaning and normalization to the dataset. A finer text normalization increases the chance of successful deduplication at the exact match step, where both accuracy and confidence are assured.
+Before deduplication, we first apply multiple fine text cleaning and normalization to the dataset. A finer text normalization increases the chance of successful deduplication at the exact matching step, where both accuracy and confidence are assured.
 
 This step includes not only standard text normalization such as converting letters to lowercase, but also tailored operations in response to patterns we observed, such as removing trademark "(TM)" in `title`, removing English stop words in `journal`, and removing publisher/citation information in `abstract`. Additionally, we extract helper columns which we will use downstream. See details in each `norm_` and `extract_` functions' documentation pages.
 
@@ -101,9 +101,9 @@ b <- norm_df(b)
 # Alternatively, if you want to customize the normalization operations, refer to its sub-functions by `?norm_df` or hack the source code.
 ```
 
-## Deduplicate by exact match
+## Deduplicate by exact matching
 
-We suggest first deduplicating by exact match based on 1) "doi_norm", 2) "title", and 3) "title_norm" in order. DOI is decisive (i.e., unique to a publication). Title is also highly selective.
+We suggest first deduplicating by exact matching based on 1) "doi_norm", 2) "title", and 3) "title_norm" in order. DOI is decisive (i.e., unique to a publication). Title is also highly selective.
 
 Note that here we assume different research papers wouldn't have 100% identical titles before text normalization. This assumption should hold in most normal cases as indicated previously [(1)](https://cran.r-project.org/web/packages/synthesisr/vignettes/synthesisr_vignette.html) [(2)](https://www.researchgate.net/post/Is-it-possible-to-publish-an-article-with-nearly-similar-title-of-a-previously-published-one).
 
@@ -152,13 +152,13 @@ b2 <- b1[!duplicated(b1$match), ]
 b2 <- select(b2, -match)
 ```
 
-> 🗒️ Although it is not included in this standard pipeline, you can try further performing exact match based on "abstract_norm".
+> 🗒️ Although it is not included in this standard pipeline, you can try further performing exact matching based on "abstract_norm".
 
-## Deduplicate by fuzzy match
+## Deduplicate by fuzzy matching
 
-After we remove all duplicates by the high-confidence exact match, we now proceed to fuzzy match. Fuzzy match is made by calculating string similarity based on Levenshtein edit distance.
+After we remove all duplicates by the high-confidence exact matching, we now proceed to fuzzy matching. Fuzzy matching is made by calculating string similarity based on Levenshtein edit distance.
 
-Two major practical challenges of making the fuzzy-match deduplication process both accurate and high-throughput are
+Two major practical challenges of making the fuzzy-matching deduplication process both accurate and high-throughput are
 
 1.  How do we choose a sensible cutoff threshold for the similarity score?
 
@@ -172,7 +172,7 @@ We propose two strategies to address these challenges correspondingly.
 
 To improve the computational efficiency, we divide this process into 2 steps: (1) order the records alphabetically according to `title_norm` and compare only between the adjacent rows; (2) perform pairwise comparisons between records within the same group partitioned by the first 2 letters of `first_author_last_name_norm`.
 
-### Step 1: order + adjacent
+### Part 1: order + adjacent
 
 Firstly, we calculate string similarity between adjacent rows for columns `"title_norm"` and `"abstract_norm"`.
 
@@ -193,7 +193,7 @@ p_b2_ab <- plot_simi_dist(b2_simi, "abstract_simi")
 p_b2_ab  # show plot in the Plots tab
 ```
 
-According to the plots, 0.7 or 0.6 seems sensible cutoff threshold. For demonstration purpose, we use 0.6 here. We use `dup_find_fuzzy_adj()` to find potential duplicates by fuzzy match of string similarity between adjacent rows. The function outputs two data frames: (1) `b2` with `"match"` column added; (2) A data frame listing `id` of duplicate pairs.
+According to the plots, 0.7 or 0.6 seems sensible cutoff threshold. For demonstration purpose, we use 0.6 here. We use `dup_find_fuzzy_adj()` to find potential duplicates by fuzzy matching of string similarity between adjacent rows. The function outputs two data frames: (1) `b2` with `"match"` column added; (2) A data frame listing `id` of duplicate pairs.
 
 ```{r}
 c(b2, id_dup_pair_adj) %<-% dup_find_fuzzy_adj(b2, b2_simi, cutoff_title = 0.6, cutoff_abstract = 0.6)
@@ -223,7 +223,7 @@ b3 <- revtools::screen_duplicates(b2_inter)
 b3 <- select(b3, -c(id, match, matches))
 ```
 
-### Step 2: partition + pairwise
+### Part 2: partition + pairwise
 
 We further look for potential duplicates according to pairwise string similarity between all records within the same partitioned group for columns `"title_norm"` and `"abstract_norm"`.
 
