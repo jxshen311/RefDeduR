@@ -14,8 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, message = FALSE, warning = FALSE}
 library(RefDeduR)
+
 library(dplyr)
 library(zeallot)  # to use `%<-%`
 
@@ -24,11 +25,13 @@ knitr::opts_chunk$set(eval = FALSE)  # temporary command; to disable the code ch
 
 ## Introduction
 
-#//TODO: to re-edit { We recommend treating these as modules. we suggest following the order, but you can stop anytime if you are satisfied with the number of records retained.
+As the scientific literature grows exponentially and research becomes increasingly interdisciplinary, accurate and high-throughput reference deduplication is vital in evidence synthesis studies (e.g., systematic reviews, meta-analyses) to ensure the completeness of datasets while reduce the manual screening burden. To address these emerging needs, we developed RefDeduR. We modularize the deduplication pipeline into finely-tuned text normalization, three-step exact matching, and two-step fuzzy matching processes. The package features a decision-tree algorithm and considers preprints and conference proceedings when they co-exist with a peer-reviewed version.
 
-with the finely tuned text cleaning and normalization, even just exact matching out competes many tools - alphabetic order is also very fast }
+Below, we demonstrate the functionality of RefDeduR with an example pipeline.
 
-**✏️*If you use RefDeduR, please cite:***
+**✏️ If you use RefDeduR, please cite: \<//TODO: the paper\>**
+
+❔ If you run into issues with the package, please open an issue at <https://github.com/jxshen311/RefDeduR> or email [jiaxianshen2022\@u.northwestern.edu](jiaxianshen2022@u.northwestern.edu).
 
 ## Example dataset
 
@@ -38,13 +41,13 @@ We use an example dataset to demonstrate the recommended pipeline of RefDeduR. T
 
 The transliteration process includes 2 parts: (1) transliterate common Greek letters to their names (e.g., α to alpha, β to beta) and (2) transliterate accented characters to ASCII characters (e.g., á to a, ä to a).
 
-**Rationale:** This increases the chance of successful deduplication by exact matching. This also reduces noises when partitioning the dataset by the first 2 letters of `first_author_last_name_norm` at the fuzzy matching step. For example, a record titled "Carriage and population genetics of extended spectrum **β**-lactamase-producing Escherichia coli in cats and dogs in New Zealand" sometimes has a title "Carriage and population genetics of extended spectrum **beta**-lactamase-producing Escherichia coli in cats and dogs in New Zealand". Author names "Álvarez-Fraga, L. and Pérez, A." are sometimes "Alvarez-Fraga, L. and Perez, A.".
+**Rationale:** This increases the chance of successful deduplication by exact matching. This also reduces noises when partitioning the dataset by the first 2 letters of `first_author_last_name_norm` at the fuzzy matching step. For example, a record titled "Carriage and population genetics of extended spectrum **β**-lactamase-producing Escherichia coli in cats and dogs in New Zealand" sometimes has the title "Carriage and population genetics of extended spectrum **beta**-lactamase-producing Escherichia coli in cats and dogs in New Zealand". Author names "Álvarez-Fraga, L. and Pérez, A." are sometimes "Alvarez-Fraga, L. and Perez, A.".
 
-```{r}
+```{r, eval = FALSE}
 # Get the path to the example dataset
 input_file <- system.file("extdata", "dataset_raw.bib", package = "RefDeduR")
 
-# Specify the path to the output file. Here I put it in the same directory but you can modify the path to wherever you want to store the output file.
+# Specify the path to the output file. Here we put it in the same directory but you can modify the path to wherever you want to store the output file.
 transliterated_file <- system.file("extdata", "dataset_transliterated.bib", package = "RefDeduR")
 
 norm_transliteration(input_file, transliterated_file, method = c("greek_letter-name", "any-ascii"))
@@ -52,7 +55,7 @@ norm_transliteration(input_file, transliterated_file, method = c("greek_letter-n
 
 > ⚒️ ***Alternatively***, python scripts developed on the basis of `unidecode` package are provided. The scripts are ready to be run in terminal. Performance of the R function and the python scripts are generally similar, with only little difference induced by the difference of R package `stringi` and python package `unidecode`.
 >
-> ```{bash}
+> ```{bash, eval = FALSE}
 > # Transliterate common Greek letters to their names
 > python transliteration_greek_to_name.py <path/to/input_file> <path/to/output_file>
 > >
@@ -64,7 +67,7 @@ norm_transliteration(input_file, transliterated_file, method = c("greek_letter-n
 
 We use function `revtools::read_bibliography()` to read the transliterated bibTex file into a data frame.
 
--   I recommend using bibTex files here. According to past experience, reading .ris file seems to have formatting errors.
+-   We recommend using bibTex files here. According to past experience, reading .ris file seems to result in formatting errors.
 
 -   Alternative function: `synthesisr::read_refs()`
 
@@ -76,9 +79,9 @@ We use function `revtools::read_bibliography()` to read the transliterated bibTe
 
     </div>
 
-Here we use `revtools::read_bibliography()` because we have transliterated the Greek letters and I want the unique identifier.
+Here we use `revtools::read_bibliography()` because we have transliterated the Greek letters and we want the unique identifier.
 
-```{r}
+```{r, eval = FALSE}
 # Read the transliterated bibTex file into a data frame
 b <- revtools::read_bibliography(transliterated_file)  # 6384 rows
 
@@ -90,11 +93,11 @@ colSums(is.na(b))
 
 ## Text cleaning and normalization
 
-Before deduplication, we first apply multiple fine text cleaning and normalization to the dataset. A finer text normalization increases the chance of successful deduplication at the exact matching step, where both accuracy and confidence are assured.
+Before deduplication, we first apply multiple finely-tuned text cleaning and normalization to the dataset. A finer text normalization increases the chance of successful deduplication at the exact matching step, where both accuracy and confidence are assured.
 
 This step includes not only standard text normalization such as converting letters to lowercase, but also tailored operations in response to patterns we observed, such as removing trademark "(TM)" in `title`, removing English stop words in `journal`, and removing publisher/citation information in `abstract`. Additionally, we extract helper columns which we will use downstream. See details in each `norm_` and `extract_` functions' documentation pages.
 
-```{r}
+```{r, eval = FALSE}
 b <- norm_df(b)
 # This function `norm_df` wraps all (1) text normalization and (2) helper field extraction that are needed.
 # By default, expect the function to add 8 more columns compared with the original data frame.
@@ -111,7 +114,7 @@ The assumption may not apply to special publication types in studies that heavil
 
 ### First, we deduplicate based on "doi_norm" and "title".
 
-```{r}
+```{r, eval = FALSE}
 # We remove the identified duplicates without manual review because this is fairly conservative.
 b1 <- dedu_exact(b, match_by = c("doi_norm", "title"))
 # The most recent version will be retained at removal.
@@ -125,13 +128,13 @@ Usually, the number of duplicate sets requires review is very small (e.g., in th
 
 It is worth noting that incorporating the `double_check` mechanism here is extremely conservative. If double checking is not needed, you can incorporate `"title_norm"` into `dedu_exact()`.
 
-```{r}
+```{r, eval = FALSE}
 c(b1, b1_manual_check) %<-% dup_find_exact(b1, match_by = "title_norm", double_check = TRUE, check_by = "first_author_last_name_norm")  # Syntax %<-% must be used in this case to have the function return 2 data frames.
 ```
 
 If `b1_manual_check` is empty, nothing needs to be manually reviewed. Otherwise, you can either (1) review it in a data frame format (e.g., preview in R or `write.xlsx()`) or (2) call revtools shiny app to review.
 
--   **Note:** It seems that `revtools::screen_duplicates()` can only display duplicate **pairs** correctly (i.e., it only displays 2 records of a duplicate set with more than 2 records). *So I recommend trying option (1) first.*
+-   **Note:** It seems that `revtools::screen_duplicates()` can only display duplicate **pairs** correctly (i.e., it only displays 2 records of a duplicate set with more than 2 records). *So we recommend trying option (1) first.*
 
 -   Command to call revtools shiny app: `revtools::screen_duplicates(as.data.frame(b1_manual_check))`
 
@@ -143,7 +146,7 @@ If the records reviewed are duplicates, we can proceed to removing duplicates. O
 
 Once we finalize `match`, we can remove duplicates.
 
-```{r}
+```{r, eval = FALSE}
 # In this example, no unique record is found in b1_manual_check.
 b2 <- b1[!duplicated(b1$match), ]
 # The most recent version will be retained at removal.
@@ -166,9 +169,9 @@ Two major practical challenges of making the fuzzy-matching deduplication proces
 
 We propose two strategies to address these challenges correspondingly.
 
-1.  We examine the similarity distribution plots and use the inflection point of the curve as the sensible cutoff threshold. This is a dataset-aware method, and it also allows fine-tuning of the cutoff threshold.
+1.  We examine the similarity distribution plots and use the inflection point of the curve as the sensible cutoff threshold. This is a dataset-aware method, and it allows fine-tuning of the cutoff threshold.
 
-2.  We introduce a decision tree that incorporates multiple fields to automate the "manual review" step. This is especially helpful for large datasets, in which case the number of duplicate sets requiring manual review could be unfeasibly high (e.g., revtools output \~1,400 duplicate sets for manual confirmation when treating this example dataset).
+2.  We introduce a decision tree that incorporates multiple fields to semi-automate the "manual review" step. This is especially helpful for large datasets, in which case the number of duplicate sets requiring manual review could be unfeasibly high (e.g., revtools output \~1,400 duplicate sets for manual confirmation when treating this example dataset).
 
 To improve the computational efficiency, we divide this process into 2 steps: (1) order the records alphabetically according to `title_norm` and compare only between the adjacent rows; (2) perform pairwise comparisons between records within the same group partitioned by the first 2 letters of `first_author_last_name_norm`.
 
@@ -176,14 +179,14 @@ To improve the computational efficiency, we divide this process into 2 steps: (1
 
 Firstly, we calculate string similarity between adjacent rows for columns `"title_norm"` and `"abstract_norm"`.
 
-```{r}
+```{r, eval = FALSE}
 c(b2, b2_simi) %<-% simi_order_adj(b2, order_by = "title_norm")
 # Computing time estimation: ~ 47 sec for this data frame (3837 rows) on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB).
 ```
 
 Then we plot similarity distributions of normalized title and abstract to choose cutoffs.
 
-```{r}
+```{r, eval = FALSE}
 # Distribution of similarity scores based on normalized title
 p_b2_ti <- plot_simi_dist(b2_simi, "title_simi")
 p_b2_ti  # show plot in the Plots tab
@@ -193,21 +196,23 @@ p_b2_ab <- plot_simi_dist(b2_simi, "abstract_simi")
 p_b2_ab  # show plot in the Plots tab
 ```
 
-According to the plots, 0.7 or 0.6 seems sensible cutoff threshold. For demonstration purpose, we use 0.6 here. We use `dup_find_fuzzy_adj()` to find potential duplicates by fuzzy matching of string similarity between adjacent rows. The function outputs two data frames: (1) `b2` with `"match"` column added; (2) A data frame listing `id` of duplicate pairs.
+The plots suggest a cutoff score of 0.7 or 0.6 for the title and 0.3 for the abstract. For demonstration purpose, we use 0.7 and 0.3 here. The selected cutoffs are then passed to `dup_find_fuzzy_adj()` to locate potential duplicates. The function outputs 2 data frames: (1) the input data frame `b2` with `"match"` column added and (2) a data frame listing `id` of duplicate pairs (`id_dup_pair_adj`).
 
-```{r}
-c(b2, id_dup_pair_adj) %<-% dup_find_fuzzy_adj(b2, b2_simi, cutoff_title = 0.6, cutoff_abstract = 0.6)
+> 🗒️ Note that the inflection point serves more like a number to begin with. The result should usually be satisfactory, but you may tweak the values to see if the performance can be further improved.
+
+```{r, eval = FALSE}
+c(b2, id_dup_pair_adj) %<-% dup_find_fuzzy_adj(b2, b2_simi, cutoff_title = 0.7, cutoff_abstract = 0.3)
 ```
 
 Per the 2nd strategy, we introduce the decision tree to semi-automate the "manual review" step. Decisions are added to the `"decision"` column in `id_dup_pair`. There could be 3 levels of decisions, "duplicate", "not duplicate", and "check". If the decision is "not duplicate", `"match"` column in `df` will be modified. To ensure a high accuracy, especially a low false positive rate, output "check" is kept in the decision tree.
 
-```{r}
+```{r, eval = FALSE}
 c(b2, id_dup_pair_adj) %<-% decision_tree_adj(b2, id_dup_pair_adj)
 ```
 
 Once we get the algorithm-generated decisions, we can deduplicate accordingly for different scenarios.
 
-```{r}
+```{r, eval = FALSE}
 # For the "duplicate", we can just deduplicate by `dup_rm_adj()`. 
 b2_inter <- dup_rm_adj(b2, id_dup_pair_adj)
 
@@ -229,51 +234,36 @@ We further look for potential duplicates according to pairwise string similarity
 
 By default, we partition the dataset by the first 2 letters of `first_author_last_name_norm`. This is more efficient than another popular partitioning parameter - year - for datasets that are skewed towards recent years. Additionally, with the prevalence of preprints, partitioning by `"year"` becomes less accurate. Nevertheless, you can customize the partitioning parameter by preference.
 
-Following a pipeline similar to that in step 1, we first calculate string similarity. Because we partition the dataset, results are now stored in lists (as compared to data frames in step 1).
+Following a pipeline similar to that in part 1, we first calculate string similarity. Because we partition the dataset, results are now stored in lists (as compared to data frames in part 1).
 
-```{r}
+```{r, eval = FALSE}
 c(ls_b3, ls_b3_simi) %<-% simi_ptn_pair(b3, partition_by = "first_two_letters_first_author_last_name")
 # Computing time estimation: ~ 23 min for this data frame (3832 rows) on a Macbook Pro (Apple M1 Pro chip basic model, memory: 16 GB). You can consider running it on a high performance computing cluster if shortening the running time is of high priority.
 ```
 
-Then we find potential duplicates.
+Then we flag potential duplicates.
 
-```{r}
-id_dup_pair_pairwise <- dup_find_fuzzy_pairwise(ls_b3, ls_b3_simi, cutoff_title = 0.6, cutoff_abstract = 0.6)
+```{r, eval = FALSE}
+id_dup_pair_pairwise <- dup_find_fuzzy_pairwise(ls_b3, ls_b3_simi, cutoff_title = 0.7, cutoff_abstract = 0.7)
 ```
 
-> 🗒️ Cutoff thresholds in `dup_find_fuzzy_adj()` are usually applicable here. Alternatively, you can re-examine the similarity distribution plots by `plot_simi_dist()` and choose sensible values. Example commands are shown below.
->
-> ```{r}
-> # Merge similarity list into a data frame
-> b3_plot <- do.call("rbind", ls_b3_simi)
-> rownames(b3_plot) <- NULL
-> b3_plot <- tibble::rownames_to_column(b3_plot, var = "id")
-> >
-> # Plot: Distribution of similarity scores based on normalized title
-> p_b3_ti <- plot_simi_dist(b3_plot, "title_simi")
-> p_b3_ti  # show plot in the Plots tab
-> >
-> # Plot: Distribution of similarity scores based on normalized abstract
-> p_b3_ab <- plot_simi_dist(b3_plot, "abstract_simi")
-> p_b3_ab  # show plot in the Plots tab
-> ```
+> 🗒️ The cutoff thresholds can be inherited from part 1. To avoid over-deleting unique records, we suggest tightening the cutoff of abstract similarity to 0.7 (or 0.6) in this step, as opposed to 0.3 in part 1, where the risk is mitigated by the more restricted ordering (in contrast to the exhaustive pairwise comparison).
 
-We apply the decision tree to potential duplicates.
+We then apply the decision tree to potential duplicates.
 
-```{r}
+```{r, eval = FALSE}
 id_dup_pair_pairwise <- decision_tree_pairwise(ls_b3, id_dup_pair_pairwise)
 ```
 
 For the duplicate pairs with a "check" decision, we output them into a data frame for manual review.
 
-```{r}
+```{r, eval = FALSE}
 df_check_pairwise <- dup_screen_pairwise(ls_b3, id_dup_pair_pairwise)
 ```
 
-Similarly, we can either (1) review them directly in a data frame format (e.g., preview in R or write.xlsx()) or (2) call revtools shiny app for visulization, by `revtools::screen_duplicates(df_check_pairwise)`. However, we don't resolve duplicates directly in the revtools shiny app. Instead, we use `dup_resolve_pairwise()` to change decisions from "check" to "duplicate" or "not duplicate" according to manual review results.
+Similarly, we can either (1) review them directly in a data frame format (e.g., preview in R or write.xlsx()) or (2) call revtools shiny app for visulization by `revtools::screen_duplicates(df_check_pairwise)`. However, we don't resolve duplicates directly in the revtools shiny app. Instead, we use `dup_resolve_pairwise()` to change decisions from "check" to "duplicate" or "not duplicate" according to the manual review results.
 
-```{r}
+```{r, eval = FALSE}
 # All 4 duplicate pairs in this example dataset are "not duplicate".
 id_dup_pair_pairwise <- dup_resolve_pairwise(
   id_dup_pair_pairwise,
@@ -284,7 +274,7 @@ id_dup_pair_pairwise <- dup_resolve_pairwise(
 
 Afterwards, we remove duplicates by `dup_rm_pairwise()`.
 
-```{r}
+```{r, eval = FALSE}
 b4 <- dup_rm_pairwise(ls_b3, id_dup_pair_pairwise, to_dataframe = TRUE)
 
 # remove helper columns
@@ -293,12 +283,12 @@ b4 <- select(b4, -id, -partition)
 
 # Export the deduplicated dataset to .bib or .ris formats
 
-```{r}
+```{r, eval = FALSE}
 revtools::write_bibliography(b4, "inst/extdata/dataset_deduplicated.ris", format = "ris")  # export .ris
 # or export .bib
 #// revtools::write_bibliography(b4, "inst/extdata/dataset_deduplicated.bib", format = "bib")  
 ```
 
-Alternative function: `synthesisr::write_refs()`. According to my observation, `revtools::write_bibliography()` seems to preserve more fields in the exported file, but it's always a good idea to test both functions on your own dataset.
+Alternative function: `synthesisr::write_refs()`. According to our observation, `revtools::write_bibliography()` seems to preserve more fields in the exported file, but it's always a good idea to test both functions on your own dataset.
 
-> 🗒️ We export .ris file here because the downstream applications (e.g., I tested Covidence , Rayyan, and Endnote) in my pipeline seem easier to recognize a .ris file than a .bib file.
+> 🗒️ We export .ris file here because the downstream applications (e.g., we tested Covidence , Rayyan, and Endnote) in our pipeline seem easier to recognize a .ris file than a .bib file.
