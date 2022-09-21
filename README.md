@@ -7,7 +7,7 @@
 status](https://github.com/rossellhayes/ipa/workflows/R-CMD-check/badge.svg)](https://github.com/rossellhayes/ipa/actions)
 [![License:
 GPL3.0](https://img.shields.io/badge/license-GPL3.0-blue.svg)](https://cran.r-project.org/web/licenses/GPL3.0)
-[![](https://img.shields.io/badge/devel%20version-0.0.0.9000-green.svg)](https://github.com/jxshen311/RefDeduR)
+[![](https://img.shields.io/badge/devel%20version-0.1.0-green.svg)](https://github.com/jxshen311/RefDeduR)
 
 RefDeduR is an R package that supports accurate and high-throughput
 reference deduplication. It is especially useful for large datasets and
