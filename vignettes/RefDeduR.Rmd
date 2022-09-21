@@ -1,5 +1,6 @@
 ---
 title: "RefDeduR: a text-normalization and decision-tree aided R package enabling accurate and high-throughput reference deduplication for large datasets"
+author: Jiaxian Shen, Fangqiong Ling, Erica M. Hartmann
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{RefDeduR: a text-normalization and decision-tree aided R package enabling accurate and high-throughput reference deduplication for large datasets}
@@ -14,13 +15,15 @@ knitr::opts_chunk$set(
 )
 ```
 
+**✏️** If you use RefDeduR, please cite: \<//TODO: the paper\>
+
+❓ If you run into issues with the package, please open an issue at <https://github.com/jxshen311/RefDeduR> or email [jiaxianshen2022\@u.northwestern.edu]{.underline}.
+
 ```{r setup, message = FALSE, warning = FALSE}
 library(RefDeduR)
 
 library(dplyr)
 library(zeallot)  # to use `%<-%`
-
-knitr::opts_chunk$set(eval = FALSE)  # temporary command; to disable the code chunks from running
 ```
 
 ## Introduction
@@ -28,10 +31,6 @@ knitr::opts_chunk$set(eval = FALSE)  # temporary command; to disable the code ch
 As the scientific literature grows exponentially and research becomes increasingly interdisciplinary, accurate and high-throughput reference deduplication is vital in evidence synthesis studies (e.g., systematic reviews, meta-analyses) to ensure the completeness of datasets while reduce the manual screening burden. To address these emerging needs, we developed RefDeduR. We modularize the deduplication pipeline into finely-tuned text normalization, three-step exact matching, and two-step fuzzy matching processes. The package features a decision-tree algorithm and considers preprints and conference proceedings when they co-exist with a peer-reviewed version.
 
 Below, we demonstrate the functionality of RefDeduR with an example pipeline.
-
-**✏️ If you use RefDeduR, please cite: \<//TODO: the paper\>**
-
-❔ If you run into issues with the package, please open an issue at <https://github.com/jxshen311/RefDeduR> or email [jiaxianshen2022\@u.northwestern.edu](jiaxianshen2022@u.northwestern.edu).
 
 ## Example dataset
 
@@ -195,6 +194,8 @@ p_b2_ti  # show plot in the Plots tab
 p_b2_ab <- plot_simi_dist(b2_simi, "abstract_simi")
 p_b2_ab  # show plot in the Plots tab
 ```
+
+![title_norm](../inst/extdata/title_norm.pdf){width="100%" height="5in"} ![abstract_norm](../inst/extdata/abstract_norm.pdf){width="100%" height="5in"}
 
 The plots suggest a cutoff score of 0.7 or 0.6 for the title and 0.3 for the abstract. For demonstration purpose, we use 0.7 and 0.3 here. The selected cutoffs are then passed to `dup_find_fuzzy_adj()` to locate potential duplicates. The function outputs 2 data frames: (1) the input data frame `b2` with `"match"` column added and (2) a data frame listing `id` of duplicate pairs (`id_dup_pair_adj`).
 
