@@ -34,10 +34,10 @@ dup_rm_adj <- function(
 
 
 
-  for (ii in which(id_dup_pair_adj$decision == "duplicate")) {
+  for (ii in which(id_dup_pair$decision == "duplicate")) {
 
-    r1 <- which(df$id == id_dup_pair_adj$id_r1[ii])
-    r2 <- which(df$id == id_dup_pair_adj$id_r2[ii])
+    r1 <- which(df$id == id_dup_pair$id_r1[ii])
+    r2 <- which(df$id == id_dup_pair$id_r2[ii])
 
     if (any(grepl("xiv|preprint", c(df$journal_norm[r1]), ignore.case = T)) | any(grepl("conference", df[r1, which(colnames(df) %in% c("booktitle", "publisher", "note"))], ignore.case = T))) {
       df <- df[-r1, ]
