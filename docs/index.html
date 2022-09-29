@@ -36,10 +36,13 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
-  <a class="nav-link" href="articles/RefDeduR.html">Get started</a>
-</li>
-<li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/RefDeduR_tutorial.html">RefDeduR tutorial</a>
+  </div>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -58,7 +61,7 @@
 <a class="anchor" aria-label="anchor" href="#refdedur-"></a>
 </h1></div>
 
-<p>RefDeduR is an R package that supports accurate and high-throughput reference deduplication. It is especially useful for large datasets and operates on standard bibliographic information (i.e., It does not require information that cannot be retrieved from a mainstream search engine such as PMID.)</p>
+<p>RefDeduR is an R package that supports accurate and high-throughput reference deduplication. It is especially useful for large datasets and operates on standard bibliographic information (i.e., it does not require information that cannot be retrieved from a mainstream search engine such as PMID).</p>
 <p>The deduplication pipeline is modularized into finely-tuned text normalization, three-step exact matching, and two-step fuzzy matching processes. The package features a decision-tree algorithm and considers preprints and conference proceedings when they co-exist with a peer-reviewed version.</p>
 <div class="section level2">
 <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a>

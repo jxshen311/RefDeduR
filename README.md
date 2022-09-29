@@ -11,9 +11,9 @@ GPL3.0](https://img.shields.io/badge/license-GPL3.0-blue.svg)](https://cran.r-pr
 
 RefDeduR is an R package that supports accurate and high-throughput
 reference deduplication. It is especially useful for large datasets and
-operates on standard bibliographic information (i.e., It does not
+operates on standard bibliographic information (i.e., it does not
 require information that cannot be retrieved from a mainstream search
-engine such as PMID.)
+engine such as PMID).
 
 The deduplication pipeline is modularized into finely-tuned text
 normalization, three-step exact matching, and two-step fuzzy matching

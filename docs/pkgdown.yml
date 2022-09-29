@@ -2,6 +2,6 @@ pandoc: 2.17.1.1
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
-  RefDeduR: RefDeduR.html
-last_built: 2022-09-29T03:55Z
+  RefDeduR_tutorial: RefDeduR_tutorial.html
+last_built: 2022-09-29T04:30Z
 

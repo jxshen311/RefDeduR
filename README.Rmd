@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 `r badger::badge_github_actions("rossellhayes/ipa")` `r badger::badge_license("GPL3.0")` `r badger::badge_devel("jxshen311/RefDeduR", "green")`
 
-RefDeduR is an R package that supports accurate and high-throughput reference deduplication. It is especially useful for large datasets and operates on standard bibliographic information (i.e., It does not require information that cannot be retrieved from a mainstream search engine such as PMID.)
+RefDeduR is an R package that supports accurate and high-throughput reference deduplication. It is especially useful for large datasets and operates on standard bibliographic information (i.e., it does not require information that cannot be retrieved from a mainstream search engine such as PMID).
 
 The deduplication pipeline is modularized into finely-tuned text normalization, three-step exact matching, and two-step fuzzy matching processes. The package features a decision-tree algorithm and considers preprints and conference proceedings when they co-exist with a peer-reviewed version.
 
