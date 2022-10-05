@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-**✏️** If you use RefDeduR, please cite: \<//TODO: the paper\>
+**✏️** If you use RefDeduR, please cite: https://www.biorxiv.org/content/10.1101/2022.09.29.510210v1
 
 ❓ If you run into issues with the package, please open an issue at <https://github.com/jxshen311/RefDeduR> or email [jiaxianshen2022\@u.northwestern.edu]{.underline}.
 

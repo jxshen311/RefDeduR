@@ -41,16 +41,19 @@ devtools::install_github("jxshen311/RefDeduR")
 
 ## Tutorial, website and publication
 
-For a step-by-step tutorial with an example dataset, see \<//TODO: link
-to the vignette\>
+-   For a step-by-step tutorial with an example dataset, see
+    <https://jxshen311.github.io/RefDeduR/articles/RefDeduR_tutorial.html>.
 
-For a complete introduction, check out the website.
+-   For a complete introduction, check out the website:
+    <https://jxshen311.github.io/RefDeduR/>.
 
-For more information, check out the publication.
+-   For more information, check out the preprint on bioRxiv:
+    <https://www.biorxiv.org/content/10.1101/2022.09.29.510210v1>.
 
 ## Citation
 
-If you use RefDeduR, please cite: \<//TODO: the paper\>
+If you use RefDeduR, please cite:
+<https://www.biorxiv.org/content/10.1101/2022.09.29.510210v1>
 
 ## Acknowledgement
 
