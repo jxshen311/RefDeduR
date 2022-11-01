@@ -1,5 +1,5 @@
 Package: RefDeduR
-Title: What the Package Does (One Line, Title Case)
+Title: Accurate and High-throughput Reference Deduplication for Large Datasets
 Version: 0.1.0
 Authors@R: 
     person(
