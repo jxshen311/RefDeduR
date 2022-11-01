@@ -49,15 +49,15 @@ dup_rm_pairwise <- function(
     } else if (any(grepl("xiv|preprint", c(ls_df[[partition]]$journal_norm[r2]), ignore.case = T)) | any(grepl("conference", ls_df[[partition]][r2, which(colnames(ls_df[[partition]]) %in% c("booktitle", "publisher", "note"))], ignore.case = T))){
       ls_df[[partition]] <- ls_df[[partition]][-r2, ]
     } else if (any(is.na(ls_df[[partition]]$year[c(r1, r2)]))){
-      if (is.na(ls_df[[partition]]$year[c(r2)])) {
-        ls_df[[partition]] <- ls_df[[partition]][-r2, ]
+      if (is.na(ls_df[[partition]]$year[c(r1)])) {
+        ls_df[[partition]] <- ls_df[[partition]][-r1, ]
       } else {
-        ls_df[[partition]] <- ls_df[[partition]][-r1, ]  # if both NA, remove r2
+        ls_df[[partition]] <- ls_df[[partition]][-r2, ]  # if both NA, remove r1
       }
-    } else if (ls_df[[partition]]$year[r1] >= ls_df[[partition]]$year[r2]) {
-      ls_df[[partition]] <- ls_df[[partition]][-r2, ]
-    } else {
+    } else if (ls_df[[partition]]$year[r1] <= ls_df[[partition]]$year[r2]) {
       ls_df[[partition]] <- ls_df[[partition]][-r1, ]
+    } else {
+      ls_df[[partition]] <- ls_df[[partition]][-r2, ]
     }
 
   }

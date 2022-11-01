@@ -44,15 +44,15 @@ dup_rm_adj <- function(
     } else if (any(grepl("xiv|preprint", c(df$journal_norm[r2]), ignore.case = T)) | any(grepl("conference", df[r2, which(colnames(df) %in% c("booktitle", "publisher", "note"))], ignore.case = T))){
       df <- df[-r2, ]
     } else if (any(is.na(df$year[c(r1, r2)]))){
-      if (is.na(df$year[c(r2)])) {
-        df <- df[-r2, ]
+      if (is.na(df$year[c(r1)])) {
+        df <- df[-r1, ]
       } else {
-        df <- df[-r1, ]  # if both NA, remove r2
+        df <- df[-r2, ]  # if both NA, remove r2
       }
-    } else if (df$year[r1] >= df$year[r2]) {
-      df <- df[-r2, ]
-    } else {
+    } else if (df$year[r1] <= df$year[r2]) {
       df <- df[-r1, ]
+    } else {
+      df <- df[-r2, ]
     }
 
   }
